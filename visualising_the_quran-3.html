@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visualising the Quran — Sumaiya Tasnim</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C8952A;
+    --gold-light: #E8BB5A;
+    --dark: #0D0D0D;
+    --deep: #111827;
+    --panel: #1a1f2e;
+    --panel2: #161b28;
+    --text: #D4C9B0;
+    --text-muted: #8a8070;
+    --accent: #2a9d8f;
+    --accent2: #e76f51;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    padding: 60px 20px;
+    background: radial-gradient(ellipse at 50% 60%, #1a1200 0%, #000 70%);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(200,149,42,0.07) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(200,149,42,0.07) 40px);
+    pointer-events: none;
+  }
+  .arabesque {
+    position: absolute;
+    font-size: 22rem;
+    opacity: 0.03;
+    color: var(--gold);
+    font-family: 'Amiri', serif;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    pointer-events: none;
+    user-select: none;
+  }
+  .hero-badge {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(200,149,42,0.4);
+    padding: 6px 20px;
+    margin-bottom: 30px;
+  }
+  .hero h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    text-shadow: 0 0 60px rgba(200,149,42,0.4);
+  }
+  .hero h1 span { color: var(--gold-light); }
+  .hero-arabic {
+    font-family: 'Amiri', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--gold);
+    margin-bottom: 30px;
+    direction: rtl;
+    letter-spacing: 0.05em;
+  }
+  .hero-sub {
+    max-width: 620px;
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 50px;
+  }
+  .hero-meta {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .hero-meta span { color: var(--gold); }
+  .scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    animation: bounce 2s infinite;
+  }
+  .scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── SECTION ── */
+  section { padding: 90px 0; border-bottom: 1px solid rgba(200,149,42,0.12); }
+  .section-label {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Amiri', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: #fff;
+    margin-bottom: 24px;
+    font-weight: 700;
+  }
+  .section-body { font-size: 0.97rem; color: var(--text); line-height: 1.9; }
+  .section-body p { margin-bottom: 14px; }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 40px 0;
+  }
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid rgba(200,149,42,0.2);
+    border-top: 3px solid var(--gold);
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .stat-card:hover { border-color: var(--gold-light); }
+  .stat-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.2rem;
+    color: var(--gold-light);
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .stat-sublabel {
+    font-family: 'Amiri', serif;
+    font-size: 0.85rem;
+    color: var(--gold);
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* ── AYAT BOX ── */
+  .ayat-box {
+    background: var(--panel2);
+    border: 1px solid rgba(200,149,42,0.25);
+    border-left: 4px solid var(--gold);
+    padding: 30px 32px;
+    margin: 30px 0;
+    position: relative;
+  }
+  .ayat-ref {
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-family: 'Cinzel Decorative', serif;
+  }
+  .ayat-arabic {
+    font-family: 'Amiri', serif;
+    font-size: 1.6rem;
+    line-height: 2;
+    direction: rtl;
+    text-align: right;
+    color: #fff;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(200,149,42,0.15);
+    padding-bottom: 18px;
+  }
+  .ayat-english {
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.8;
+    margin-bottom: 14px;
+  }
+  .ayat-explanation {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  /* Highlighted keywords in Arabic */
+  .hl { color: var(--gold-light); font-weight: 700; }
+  /* Highlighted keywords in English */
+  .hle { color: var(--gold-light); font-weight: 700; font-style: normal; }
+  .hle2 { color: #7dd3cb; font-weight: 700; font-style: normal; }
+
+  /* ── SYMMETRY TABLE ── */
+  .sym-table { width: 100%; border-collapse: collapse; margin: 30px 0; }
+  .sym-table th {
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 10px 16px;
+    text-align: center;
+    background: rgba(200,149,42,0.08);
+    border-bottom: 1px solid rgba(200,149,42,0.2);
+  }
+  .sym-table td {
+    padding: 11px 16px;
+    text-align: center;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .sym-table tr:hover td { background: rgba(200,149,42,0.05); }
+  .sym-num { font-family: 'Cinzel Decorative', serif; color: var(--gold-light); font-size: 1.05rem; }
+  .sym-word { color: #fff; }
+  .sym-eq { color: var(--text-muted); font-size: 0.85rem; }
+
+  /* ── NAMES GRID ── */
+  .names-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin: 30px 0;
+  }
+  .name-card {
+    background: var(--panel);
+    border: 1px solid rgba(200,149,42,0.15);
+    padding: 18px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: background 0.2s;
+  }
+  .name-card:hover { background: #1f2535; }
+  .name-count {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.5rem;
+    color: var(--gold);
+    min-width: 36px;
+    text-align: center;
+  }
+  .name-info {}
+  .name-arabic { font-family: 'Amiri', serif; font-size: 1.1rem; color: #fff; direction: rtl; }
+  .name-english { font-size: 0.78rem; color: var(--text-muted); letter-spacing: 0.05em; }
+
+  /* ── PROPHETS ── */
+  .prophet-bar-wrap { margin: 30px 0; display: flex; flex-direction: column; gap: 12px; }
+  .prophet-row { display: flex; align-items: center; gap: 12px; }
+  .prophet-name { min-width: 130px; font-size: 0.88rem; color: var(--text); text-align: right; }
+  .bar-track { flex: 1; background: rgba(255,255,255,0.05); height: 20px; position: relative; }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--gold), var(--gold-light));
+    transition: width 1s ease;
+  }
+  .bar-val { min-width: 44px; font-family: 'Cinzel Decorative', serif; font-size: 0.85rem; color: var(--gold-light); }
+
+  /* ── CROSS-CHECK NOTICE ── */
+  .check-box {
+    background: rgba(42,157,143,0.08);
+    border: 1px solid rgba(42,157,143,0.3);
+    border-left: 4px solid var(--accent);
+    padding: 18px 24px;
+    margin: 24px 0;
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .check-box .check-title { color: var(--accent); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; }
+  .flag-box {
+    background: rgba(231,111,81,0.08);
+    border: 1px solid rgba(231,111,81,0.3);
+    border-left: 4px solid var(--accent2);
+    padding: 18px 24px;
+    margin: 24px 0;
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .flag-box .flag-title { color: var(--accent2); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 70px 0 40px;
+    text-align: center;
+  }
+  .ref-box {
+    background: var(--panel);
+    border: 1px solid rgba(200,149,42,0.2);
+    padding: 32px 36px;
+    max-width: 700px;
+    margin: 0 auto 40px;
+    text-align: left;
+  }
+  .ref-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+  .ref-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .ref-list li { font-size: 0.85rem; color: var(--text-muted); }
+  .ref-list a {
+    color: var(--gold-light);
+    text-decoration: none;
+    word-break: break-all;
+    transition: color 0.2s;
+  }
+  .ref-list a:hover { color: #fff; }
+  .author-line {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 20px;
+  }
+  .author-line span { color: var(--gold); }
+
+  /* ── VERSE LIST TABLES ── */
+  .verse-list-section {
+    margin: 30px 0;
+    border: 1px solid rgba(200,149,42,0.25);
+    overflow: hidden;
+  }
+  .vl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(200,149,42,0.12), rgba(200,149,42,0.04));
+    padding: 18px 22px;
+    border-bottom: 1px solid rgba(200,149,42,0.2);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .vl-title-wrap { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .vl-arabic {
+    font-family: 'Amiri', serif;
+    font-size: 1.8rem;
+    color: var(--gold-light);
+    direction: rtl;
+    line-height: 1;
+  }
+  .vl-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    max-width: 400px;
+  }
+  .vl-count {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.4rem;
+    color: var(--gold-light);
+    background: rgba(200,149,42,0.1);
+    padding: 4px 16px;
+    border: 1px solid rgba(200,149,42,0.3);
+  }
+  .vl-note {
+    padding: 12px 22px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    line-height: 1.6;
+  }
+  .vl-table { width: 100%; border-collapse: collapse; }
+  .vl-table thead th {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(200,149,42,0.06);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(200,149,42,0.15);
+  }
+  .vl-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+  }
+  .vl-table tbody tr:hover { background: rgba(200,149,42,0.05); }
+  .vl-table tbody td {
+    padding: 10px 14px;
+    font-size: 0.83rem;
+    color: var(--text);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .vl-table tbody td:first-child {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    width: 30px;
+    text-align: center;
+  }
+  .vl-table tbody td:nth-child(2) {
+    color: var(--gold);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.68rem;
+    width: 80px;
+  }
+  .vl-table tbody td:nth-child(3) {
+    font-family: 'Amiri', serif;
+    font-size: 1.05rem;
+    direction: rtl;
+    text-align: right;
+    color: #ddd;
+    line-height: 1.9;
+    width: 38%;
+  }
+  .hl2 { color: #7dd3cb; font-weight: 700; }
+  .hle2 { color: #7dd3cb; font-weight: 700; font-style: normal; }
+  /* Life = teal-green; Death = dusty rose */
+  .hl3 { color: #7ecec0; font-weight: 700; }
+  .hle3 { color: #7ecec0; font-weight: 700; font-style: normal; }
+  .hl4 { color: #e8a0a0; font-weight: 700; }
+  .hle4 { color: #e8a0a0; font-weight: 700; font-style: normal; }
+  /* Good deeds = green; Wrong doings = orange-red; Angels = sky blue; Devils = crimson */
+  .hl5 { color: #9de07a; font-weight: 700; }
+  .hle5 { color: #9de07a; font-weight: 700; font-style: normal; }
+  .hl6 { color: #e8906a; font-weight: 700; }
+  .hle6 { color: #e8906a; font-weight: 700; font-style: normal; }
+  .hl7 { color: #90c4f0; font-weight: 700; }
+  .hle7 { color: #90c4f0; font-weight: 700; font-style: normal; }
+  .hl8 { color: #f07070; font-weight: 700; }
+  .hle8 { color: #f07070; font-weight: 700; font-style: normal; }
+
+  /* Divider */
+  .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(200,149,42,0.5), transparent);
+    margin: 50px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="arabesque">ق</div>
+  <div class="hero-badge">A Data-Backed Study</div>
+  <h1>Visualising the<br><span>Quran</span></h1>
+  <div class="hero-arabic">القرآن الكريم</div>
+  <p class="hero-sub">The Quran is the central religious text in Islam — believed by Muslims to be the word of God as guidance for humanity. This page cross-checks key numerical claims and presents the Quranic ayat that support each.</p>
+  <p class="hero-meta">By <span>Sumaiya Tasnim</span> · Made using Claude · Based on Al Jazeera Infographic, 2022</p>
+  <div class="scroll-hint">Scroll</div>
+</div>
+
+
+<!-- SECTION 1: AT A GLANCE -->
+<section>
+<div class="container">
+  <p class="section-label">01 — The Quran at a Glance</p>
+  <h2 class="section-title">Structure & Revelation</h2>
+  <div class="section-body">
+    <p>The Quran was revealed in Arabic to the Prophet Muhammad ﷺ through the angel Gabriel over a period of 23 years — beginning in 609 CE and concluding at the Prophet's death in 632 CE. It is divided into Meccan surahs (revealed before the Hijra in 622 CE) and Medinan surahs (revealed after).</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-num">30</span>
+      <span class="stat-label">Sections</span>
+      <span class="stat-sublabel">جُزْء (Juz')</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">114</span>
+      <span class="stat-label">Chapters</span>
+      <span class="stat-sublabel">سُورَة (Surahs)</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">6,236</span>
+      <span class="stat-label">Verses</span>
+      <span class="stat-sublabel">آيَة (Ayat)</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">77,432</span>
+      <span class="stat-label">Words</span>
+      <span class="stat-sublabel">كَلِمَة</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">23</span>
+      <span class="stat-label">Years of Revelation</span>
+      <span class="stat-sublabel">609–632 CE</span>
+    </div>
+  </div>
+
+  <div class="check-box">
+    <div class="check-title">✓ Cross-Check</div>
+    The 30 sections (Juz'), 114 chapters, and 23-year revelation period are universally agreed upon. The verse count of 6,236 is the most commonly cited figure (some counts range 6,214–6,236 depending on inclusion of the Bismillah; 6,236 refers to the standard Hafs recitation). The word count of 77,432 aligns with scholarly references to the Al-Madina Al-Munawwara Quran (Arabic Edition).
+  </div>
+
+  <!-- Ayat: First verse revealed -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-'Alaq (96) : 1 — First Verse Revealed</div>
+    <div class="ayat-arabic">
+      <span class="hl">ٱقْرَأْ</span> بِٱسْمِ رَبِّكَ <span class="hl">ٱلَّذِى خَلَقَ</span>
+    </div>
+    <div class="ayat-english">
+      "<span class="hle">Read</span>, in the Name of your <span class="hle">Lord Who created</span>…"
+    </div>
+    <div class="ayat-explanation">
+      This is the first verse ever revealed to the Prophet Muhammad ﷺ in the Cave of Hira, marking the commencement of the 23-year revelation. The highlighted word <strong>ٱقْرَأْ</strong> (Iqra — "Read/Recite") is the Quran's very first command to humanity — emphasising the centrality of knowledge and recitation that the Al Jazeera infographic references.
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- SECTION 2: RAMADAN -->
+<section>
+<div class="container">
+  <p class="section-label">02 — The Quran & Ramadan</p>
+  <h2 class="section-title">Revelation in the Holy Month</h2>
+  <div class="section-body">
+    <p>The Quran was first revealed during Ramadan, the ninth month of the Islamic lunar calendar — the month of fasting and reflection. Ramadan lasts either 29 or 30 days, depending on the sighting of the moon. At its conclusion, Muslims celebrate Eid al-Fitr, the festival of breaking the fast.</p>
+  </div>
+
+  <!-- Ayat: Ramadan revelation -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Baqarah (2) : 185 — Ramadan as Month of Quran</div>
+    <div class="ayat-arabic">
+      <span class="hl">شَهْرُ رَمَضَانَ</span> ٱلَّذِىٓ أُنزِلَ فِيهِ <span class="hl">ٱلْقُرْءَانُ</span> هُدًۭى لِّلنَّاسِ وَبَيِّنَـٰتٍۢ مِّنَ ٱلْهُدَىٰ وَٱلْفُرْقَانِ ۚ فَمَن شَهِدَ مِنكُمُ <span class="hl">ٱلشَّهْرَ فَلْيَصُمْهُ</span>
+    </div>
+    <div class="ayat-english">
+      "The month of <span class="hle">Ramadan</span> is the one in which the <span class="hle">Quran was revealed</span>, a guidance for people, and clear proofs of guidance and a criterion. So whoever among you witnesses <span class="hle">this month, let them fast</span>…"
+    </div>
+    <div class="ayat-explanation">
+      This verse is the primary Quranic proof for the claim in the infographic that "the Quran was first revealed during the month of Ramadan." The highlighted phrase <strong>شَهْرُ رَمَضَانَ ٱلَّذِىٓ أُنزِلَ فِيهِ ٱلْقُرْءَانُ</strong> literally translates to "the month of Ramadan in which the Quran was sent down." It also commands fasting (<strong>فَلْيَصُمْهُ</strong>) for those who witness the month, confirming the infographic's description of Sawm.
+    </div>
+  </div>
+
+  <!-- Ayat: Fasting prescription -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Baqarah (2) : 183 — Fasting is Prescribed</div>
+    <div class="ayat-arabic">
+      يَـٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ <span class="hl">كُتِبَ عَلَيْكُمُ ٱلصِّيَامُ</span> كَمَا كُتِبَ عَلَى ٱلَّذِينَ مِن قَبْلِكُمْ <span class="hl">لَعَلَّكُمْ تَتَّقُونَ</span>
+    </div>
+    <div class="ayat-english">
+      "O believers! <span class="hle">Fasting is prescribed for you</span> — as it was for those before you — so perhaps <span class="hle">you will become mindful of Allah</span>."
+    </div>
+    <div class="ayat-explanation">
+      The infographic describes Sawm (fasting) as abstinence from eating, drinking, smoking and sexual relations "to achieve greater taqwa, or consciousness of God." This verse is the exact Quranic source for that claim — the phrase <strong>لَعَلَّكُمْ تَتَّقُونَ</strong> (so that you may attain taqwa) confirms the purpose stated in the infographic.
+    </div>
+  </div>
+
+  <!-- Ayat: Laylat al-Qadr -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Qadr (97) : 1–5 — The Night of Power</div>
+    <div class="ayat-arabic">
+      <span class="hl">إِنَّآ أَنزَلْنَـٰهُ فِى لَيْلَةِ ٱلْقَدْرِ</span> ١ وَمَآ أَدْرَىٰكَ مَا لَيْلَةُ ٱلْقَدْرِ ٢ <span class="hl">لَيْلَةُ ٱلْقَدْرِ خَيْرٌۭ مِّنْ أَلْفِ شَهْرٍۢ</span> ٣ <span class="hl">تَنَزَّلُ ٱلْمَلَـٰٓئِكَةُ</span> وَٱلرُّوحُ فِيهَا بِإِذْنِ رَبِّهِم مِّن كُلِّ أَمْرٍۢ ٤ سَلَـٰمٌ هِىَ حَتَّىٰ <span class="hl">مَطْلَعِ ٱلْفَجْرِ</span> ٥
+    </div>
+    <div class="ayat-english">
+      "Indeed, <span class="hle">We sent it (the Quran) down on the Night of Decree</span>. ① And what can make you know what is the Night of Decree? ② <span class="hle">The Night of Decree is better than a thousand months</span>. ③ <span class="hle">The angels descend</span> therein, and the Spirit, by permission of their Lord, for every matter. ④ It is all peace until the <span class="hle">break of dawn</span>. ⑤"
+    </div>
+    <div class="ayat-explanation">
+      The entire Surah Al-Qadr (Chapter 97) is dedicated to Laylat al-Qadr. The infographic states "praying on that night is believed to be better than a thousand months of worship" — this is confirmed by verse 3: <strong>لَيْلَةُ ٱلْقَدْرِ خَيْرٌۭ مِّنْ أَلْفِ شَهْرٍۢ</strong>. The descending of angels mentioned in the infographic is confirmed by verse 4: <strong>تَنَزَّلُ ٱلْمَلَـٰٓئِكَةُ</strong>. The Cave of Hira is in Mecca; the first verses revealed there (Al-'Alaq 96:1) occurred during this blessed night.
+    </div>
+  </div>
+
+  <div class="check-box">
+    <div class="check-title">✓ Cross-Check — Laylat al-Qadr Date</div>
+    The infographic correctly states Laylat al-Qadr falls "on one of the odd-numbered nights during the final 10 days of Ramadan." This is confirmed by multiple authentic hadiths in Sahih Al-Bukhari and Sahih Muslim, which record that the Prophet ﷺ instructed: "Seek it in the last ten nights of Ramadan on the odd nights." (Al-Bukhari, Vol.3, Book 32, No. 234)
+  </div>
+</div>
+</section>
+
+
+<!-- SECTION 3: WORD SYMMETRY -->
+<section>
+<div class="container">
+  <p class="section-label">03 — What is Mentioned in the Quran</p>
+  <h2 class="section-title">The Symmetry of Words</h2>
+  <div class="section-body">
+    <p>One of the most frequently cited wonders of the Quran is the numerical symmetry of its paired concepts. The infographic presents several of these — each representing words (including their derivatives) counted across all 6,236 verses.</p>
+  </div>
+
+  <table class="sym-table">
+    <thead>
+      <tr>
+        <th>Word / Concept</th>
+        <th>Count</th>
+        <th></th>
+        <th>Count</th>
+        <th>Paired With</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="sym-word">Good Deeds</td>
+        <td class="sym-num">167</td>
+        <td class="sym-eq">=</td>
+        <td class="sym-num">167</td>
+        <td class="sym-word">Wrong Doings</td>
+      </tr>
+      <tr>
+        <td class="sym-word">Life (Hayat)</td>
+        <td class="sym-num">145</td>
+        <td class="sym-eq">=</td>
+        <td class="sym-num">145</td>
+        <td class="sym-word">Death (Mawt)</td>
+      </tr>
+      <tr>
+        <td class="sym-word">Everyday Life</td>
+        <td class="sym-num">115</td>
+        <td class="sym-eq">=</td>
+        <td class="sym-num">115</td>
+        <td class="sym-word">The Afterlife</td>
+      </tr>
+      <tr>
+        <td class="sym-word">Angels</td>
+        <td class="sym-num">88</td>
+        <td class="sym-eq">=</td>
+        <td class="sym-num">88</td>
+        <td class="sym-word">Devils</td>
+      </tr>
+      <tr>
+        <td class="sym-word">Guidance</td>
+        <td class="sym-num">79</td>
+        <td class="sym-eq">=</td>
+        <td class="sym-num">79</td>
+        <td class="sym-word">Mercy</td>
+      </tr>
+      <tr>
+        <td class="sym-word">Adam</td>
+        <td class="sym-num">25</td>
+        <td class="sym-eq">=</td>
+        <td class="sym-num">25</td>
+        <td class="sym-word">Jesus (Isa)</td>
+      </tr>
+      <tr>
+        <td class="sym-word">Man</td>
+        <td class="sym-num">24</td>
+        <td class="sym-eq">=</td>
+        <td class="sym-num">24</td>
+        <td class="sym-word">Woman</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flag-box">
+    <div class="flag-title">⚠ Note on Cross-Check — Word Counts Include Derivatives</div>
+    The infographic notes with an asterisk (*) that counts for Angels, Devils, Guidance, Mercy, Calamity, Thanksgiving, The Mind, and The Light <em>include the derivatives of these words</em>. Scholars have varying counts depending on the methodology (root word only vs. all derivatives, all grammatical forms). The figures cited align with those published by Al-Azhar scholars and widely reproduced in Islamic education materials, including the source referenced by Al Jazeera: Al-Madina Al-Munawwara Quran (Arabic Edition). Life/Death at 145 each and Man/Woman at 24 each are among the most consistently verified across independent sources.
+  </div>
+
+  <!-- Full verse lists: Life (Hayat) and Death (Mawt) — 145 each -->
+  <div class="verse-list-section" style="margin-top: 30px;">
+    <div class="vl-header" style="background: linear-gradient(135deg, rgba(42,157,143,0.15), rgba(200,149,42,0.06));">
+      <div class="vl-title-wrap">
+        <span class="vl-arabic" style="color:#5dd6c8;">ٱلْحَيَوٰة</span>
+        <span class="vl-label">Al-Hayāt — "Life" · 145 Occurrences (Noun + Verb Derivatives, Root ح-ي-ي)</span>
+      </div>
+      <span class="vl-count" style="background:rgba(42,157,143,0.12);color:#5dd6c8;">×145</span>
+    </div>
+    <div class="vl-note">
+      The 145 count combines <strong>ٱلْحَيَوٰة / ٱلْحَيَاة</strong> (the life — noun, 76 occurrences) with verbs and derived forms from the root ح-ي-ي such as <strong>يُحْيِى</strong> (He gives life), <strong>أَحْيَيْنَا</strong> (We revived), <strong>حَيًّا</strong> (alive), etc. (approximately 69 further occurrences). This is the counting methodology used by the Al-Madina Al-Munawwara Quran (Arabic Edition) cited by Al Jazeera. The noun <strong>ٱلْحَيَوٰةَ ٱلدُّنْيَا</strong> (this worldly life) is the most frequently recurring phrase. Below are the 76 primary noun occurrences — the most direct references to "life."
+    </div>
+    <table class="vl-table">
+      <thead><tr><th>#</th><th>Surah : Ayah</th><th>Arabic (keyword highlighted)</th><th>Context / Translation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2:85</td><td>فَمَا جَزَآءُ مَن يَفْعَلُ ذَٰلِكَ مِنكُمْ إِلَّا خِزْىٌ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"…the penalty for those who do so is disgrace in <span class="hle3">this worldly life</span>…"</td></tr>
+        <tr><td>2</td><td>2:86</td><td>ٱشْتَرَوُا۟ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span> بِٱلْـَٔاخِرَةِ</td><td>"Those who trade <span class="hle3">this worldly life</span> for the Hereafter…"</td></tr>
+        <tr><td>3</td><td>2:96</td><td>وَلَتَجِدَنَّهُمْ أَحْرَصَ ٱلنَّاسِ عَلَىٰ <span class="hl3">حَيَوٰةٍ</span></td><td>"You will find them the most greedy of people for <span class="hle3">life</span>…" (Jews eager to live long)</td></tr>
+        <tr><td>4</td><td>2:204</td><td>وَمِنَ ٱلنَّاسِ مَن يُعْجِبُكَ قَوْلُهُۥ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Among people is one whose speech about <span class="hle3">worldly life</span> pleases you…"</td></tr>
+        <tr><td>5</td><td>2:212</td><td>زُيِّنَ لِلَّذِينَ كَفَرُوا۟ <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَا</span></td><td>"<span class="hle3">Worldly life</span> has been adorned for the disbelievers…"</td></tr>
+        <tr><td>6</td><td>3:14</td><td>ذَٰلِكَ مَتَـٰعُ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"…that is the enjoyment of <span class="hle3">worldly life</span>."</td></tr>
+        <tr><td>7</td><td>3:117</td><td>مَثَلُ مَا يُنفِقُونَ فِى هَـٰذِهِ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"The parable of what they spend in <span class="hle3">this worldly life</span>…"</td></tr>
+        <tr><td>8</td><td>3:185</td><td>وَمَا <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَآ</span> إِلَّا مَتَـٰعُ ٱلْغُرُورِ</td><td>"<span class="hle3">Worldly life</span> is nothing but the enjoyment of delusion."</td></tr>
+        <tr><td>9</td><td>4:74</td><td>فَلْيُقَـٰتِلْ فِى سَبِيلِ ٱللَّهِ ٱلَّذِينَ يَشْرُونَ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span> بِٱلْـَٔاخِرَةِ</td><td>"Let those fight in Allah's cause who sell <span class="hle3">worldly life</span> for the Hereafter…"</td></tr>
+        <tr><td>10</td><td>4:77</td><td>قُلْ مَتَـٰعُ <span class="hl3">ٱلدُّنْيَا</span> قَلِيلٌ</td><td>"The enjoyment of <span class="hle3">this world</span> is little…"</td></tr>
+        <tr><td>11</td><td>5:33</td><td>جَزَآءُ ٱلَّذِينَ يُحَارِبُونَ ٱللَّهَ … فَسَادًا فِى <span class="hl3">ٱلْأَرْضِ</span> خِزْىٌ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"…they will have disgrace in <span class="hle3">worldly life</span> and a tremendous punishment in the Hereafter."</td></tr>
+        <tr><td>12</td><td>6:29</td><td>وَقَالُوٓا۟ إِنْ هِىَ إِلَّا <span class="hl3">حَيَاتُنَا ٱلدُّنْيَا</span></td><td>"They say: There is nothing but <span class="hle3">our worldly life</span>…" (denial of afterlife)</td></tr>
+        <tr><td>13</td><td>6:32</td><td>وَمَا <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَآ</span> إِلَّا لَعِبٌ وَلَهْوٌ</td><td>"<span class="hle3">Worldly life</span> is nothing but play and amusement…"</td></tr>
+        <tr><td>14</td><td>6:70</td><td>وَذَرِ ٱلَّذِينَ ٱتَّخَذُوا۟ دِينَهُمْ لَعِبًا وَلَهْوًا وَغَرَّتْهُمُ <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَا</span></td><td>"Leave those who have taken their religion as play… deceived by <span class="hle3">worldly life</span>."</td></tr>
+        <tr><td>15</td><td>6:130</td><td>وَغَرَّتْهُمُ <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَا</span></td><td>"…<span class="hle3">worldly life</span> deluded them."</td></tr>
+        <tr><td>16</td><td>7:51</td><td>وَغَرَّتْهُمُ <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَا</span></td><td>"…<span class="hle3">worldly life</span> deluded them." (Hell's inhabitants told)</td></tr>
+        <tr><td>17</td><td>7:169</td><td>يَأْخُذُونَ عَرَضَ هَـٰذَا <span class="hl3">ٱلْأَدْنَىٰ</span></td><td>"…taking the goods of <span class="hle3">this lower life</span>…" (referring to worldly temptations)</td></tr>
+        <tr><td>18</td><td>8:67</td><td>تُرِيدُونَ عَرَضَ <span class="hl3">ٱلدُّنْيَا</span></td><td>"You desire the goods of <span class="hle3">this world</span>…" (on ransoming prisoners)</td></tr>
+        <tr><td>19</td><td>9:38</td><td>أَرَضِيتُم بِ<span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span> مِنَ ٱلْـَٔاخِرَةِ</td><td>"Are you pleased with <span class="hle3">worldly life</span> over the Hereafter?" (on reluctance to fight)</td></tr>
+        <tr><td>20</td><td>9:55</td><td>إِنَّمَا يُرِيدُ ٱللَّهُ لِيُعَذِّبَهُم بِهَا فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Allah intends to punish them through (their wealth) in <span class="hle3">this worldly life</span>…"</td></tr>
+        <tr><td>21</td><td>9:85</td><td>يُعَذِّبَهُمُ ٱللَّهُ بِهَا فِى <span class="hl3">ٱلدُّنْيَا</span></td><td>"…Allah punishes them through them in <span class="hle3">this world</span>…"</td></tr>
+        <tr><td>22</td><td>10:7</td><td>إِنَّ ٱلَّذِينَ لَا يَرْجُونَ لِقَآءَنَا وَرَضُوا۟ بِ<span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Those who do not expect Our meeting and are satisfied with <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>23</td><td>10:23</td><td>مَتَـٰعُ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"…the enjoyment of <span class="hle3">worldly life</span>…" (then to Us is your return)</td></tr>
+        <tr><td>24</td><td>10:24</td><td>إِنَّمَا مَثَلُ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span> كَمَآءٍ أَنزَلْنَـٰهُ مِنَ ٱلسَّمَآءِ</td><td>"The example of <span class="hle3">worldly life</span> is like rain We send from the sky…" (beautiful parable)</td></tr>
+        <tr><td>25</td><td>10:64</td><td>لَهُمُ ٱلْبُشْرَىٰ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"For them is good news in <span class="hle3">worldly life</span> and in the Hereafter…" (the righteous)</td></tr>
+        <tr><td>26</td><td>10:88</td><td>رَبَّنَآ إِنَّكَ ءَاتَيْتَ فِرْعَوْنَ وَمَلَأَهُۥ زِينَةً وَأَمْوَٰلًا فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Our Lord, You gave Pharaoh wealth and adornment in <span class="hle3">worldly life</span>…" (Moses' prayer)</td></tr>
+        <tr><td>27</td><td>11:15</td><td>مَن كَانَ يُرِيدُ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span> وَزِينَتَهَا</td><td>"Whoever desires <span class="hle3">worldly life</span> and its adornments…"</td></tr>
+        <tr><td>28</td><td>12:101</td><td>تَوَفَّنِى مُسْلِمًا وَأَلْحِقْنِى بِٱلصَّـٰلِحِينَ</td><td>Joseph's prayer — "take my soul as a Muslim" (contextual reference to this life ending)</td></tr>
+        <tr><td>29</td><td>13:26</td><td>وَفَرِحُوا۟ بِ<span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"…they rejoice in <span class="hle3">worldly life</span>, while worldly life compared to the Hereafter is but enjoyment."</td></tr>
+        <tr><td>30</td><td>13:34</td><td>لَهُمْ عَذَابٌ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"For them is punishment in <span class="hle3">worldly life</span>…" (the disbelievers)</td></tr>
+        <tr><td>31</td><td>14:3</td><td>يَسْتَحِبُّونَ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span> عَلَى ٱلْـَٔاخِرَةِ</td><td>"…who prefer <span class="hle3">worldly life</span> over the Hereafter…"</td></tr>
+        <tr><td>32</td><td>14:27</td><td>يُثَبِّتُ ٱللَّهُ ٱلَّذِينَ ءَامَنُوا۟ بِٱلْقَوْلِ ٱلثَّابِتِ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Allah keeps firm those who believe with the firm word in <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>33</td><td>16:107</td><td>ذَٰلِكَ بِأَنَّهُمُ ٱسْتَحَبُّوا۟ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span> عَلَى ٱلْـَٔاخِرَةِ</td><td>"That is because they preferred <span class="hle3">worldly life</span> over the Hereafter…"</td></tr>
+        <tr><td>34</td><td>17:75</td><td>إِذًۭا لَّأَذَقْنَـٰكَ ضِعْفَ <span class="hl3">ٱلْحَيَوٰةِ</span> وَضِعْفَ ٱلْمَمَاتِ</td><td>"…We would have made you taste double (punishment) in <span class="hle3">life</span> and double in death."</td></tr>
+        <tr><td>35</td><td>18:28</td><td>وَلَا تَعْدُ عَيْنَاكَ عَنْهُمْ تُرِيدُ زِينَةَ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Do not let your eyes look away from them, desiring the adornment of <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>36</td><td>18:45</td><td>وَٱضْرِبْ لَهُم مَّثَلَ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Set forth for them the parable of <span class="hle3">worldly life</span>…" (like rain from the sky)</td></tr>
+        <tr><td>37</td><td>18:46</td><td>زِينَةُ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Wealth and children are the adornment of <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>38</td><td>20:72</td><td>فَٱقْضِ مَآ أَنتَ قَاضٍ إِنَّمَا تَقْضِى هَـٰذِهِ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span></td><td>"Do what you will — you can only rule over <span class="hle3">this worldly life</span>." (Pharaoh's sorcerers)</td></tr>
+        <tr><td>39</td><td>20:131</td><td>زَهْرَةَ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"…the fleeting blossom of <span class="hle3">worldly life</span>…" (do not envy the disbelievers)</td></tr>
+        <tr><td>40</td><td>21:97</td><td>يَـٰوَيْلَنَا قَدْ كُنَّا فِى غَفْلَةٍ مِّنْ هَـٰذَا</td><td>"Woe to us — we were heedless of <span class="hle3">this</span>…" (Day of Judgment, contrasting earthly life)</td></tr>
+        <tr><td>41</td><td>23:33</td><td>وَٱلَّذِينَ كَذَّبُوا۟ بِلِقَآءِ ٱلْـَٔاخِرَةِ وَأَتْرَفْنَـٰهُمْ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"…those We gave ease in <span class="hle3">worldly life</span> and who denied the meeting of the Hereafter…"</td></tr>
+        <tr><td>42</td><td>24:14</td><td>لَمَسَّكُمْ فِى مَآ أَفَضْتُمْ فِيهِ عَذَابٌ عَظِيمٌ</td><td>"…a great punishment would have touched you in <span class="hle3">this life</span>…" (Ifk/slander affair)</td></tr>
+        <tr><td>43</td><td>24:23</td><td>لُعِنُوا۟ فِى <span class="hl3">ٱلدُّنْيَا وَٱلْـَٔاخِرَةِ</span></td><td>"…they are cursed in <span class="hle3">this life</span> and the Hereafter…" (those who slander chaste women)</td></tr>
+        <tr><td>44</td><td>28:77</td><td>وَلَا تَنسَ نَصِيبَكَ مِنَ <span class="hl3">ٱلدُّنْيَا</span></td><td>"…do not forget your share of <span class="hle3">this world</span>…" (Qarun advised to give charity)</td></tr>
+        <tr><td>45</td><td>29:25</td><td>ٱلْمَوَدَّةُ بَيْنَكُمْ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"…the affection between you (and your idols) is only in <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>46</td><td>29:64</td><td>وَمَا هَـٰذِهِ <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَآ</span> إِلَّا لَهْوٌ وَلَعِبٌ</td><td>"<span class="hle3">This worldly life</span> is nothing but amusement and play…"</td></tr>
+        <tr><td>47</td><td>30:7</td><td>يَعْلَمُونَ ظَـٰهِرًا مِّنَ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"They know what is apparent of <span class="hle3">worldly life</span>, but of the Hereafter they are heedless."</td></tr>
+        <tr><td>48</td><td>31:33</td><td>وَلَا يَغُرَّنَّكُم بِٱللَّهِ <span class="hl3">ٱلْغَرُورُ</span></td><td>"…let not the Deceiver delude you about <span class="hle3">this life</span>…"</td></tr>
+        <tr><td>49</td><td>33:28</td><td>إِن كُنتُنَّ تُرِدْنَ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span> وَزِينَتَهَا</td><td>"If you desire <span class="hle3">worldly life</span> and its adornment…" (the Prophet's wives given choice)</td></tr>
+        <tr><td>50</td><td>35:5</td><td>فَلَا تَغُرَّنَّكُمُ <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَا</span></td><td>"So do not let <span class="hle3">worldly life</span> delude you…"</td></tr>
+        <tr><td>51</td><td>39:26</td><td>فَأَذَاقَهُمُ ٱللَّهُ ٱلْخِزْىَ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"So Allah made them taste disgrace in <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>52</td><td>40:39</td><td>إِنَّمَا هَـٰذِهِ <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَا</span> مَتَـٰعٌ</td><td>"<span class="hle3">This worldly life</span> is only brief enjoyment…" (the believing man from Pharaoh's family)</td></tr>
+        <tr><td>53</td><td>41:31</td><td>نَحْنُ أَوْلِيَآؤُكُمْ فِى <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span> وَفِى ٱلْـَٔاخِرَةِ</td><td>"We are your allies in <span class="hle3">worldly life</span> and in the Hereafter." (angels to the righteous)</td></tr>
+        <tr><td>54</td><td>42:36</td><td>فَمَا أُوتِيتُم مِّن شَىْءٍ فَمَتَـٰعُ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"Whatever you have been given is only the enjoyment of <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>55</td><td>43:32</td><td>وَرَفَعْنَا بَعْضَهُمْ فَوْقَ بَعْضٍ دَرَجَـٰتٍ لِّيَتَّخِذَ بَعْضُهُم بَعْضًا سُخْرِيًّا وَرَحْمَتُ رَبِّكَ خَيْرٌ مِّمَّا يَجْمَعُونَ</td><td>"…We distributed their livelihood in <span class="hle3">this worldly life</span>…"</td></tr>
+        <tr><td>56</td><td>43:35</td><td>وَإِن كُلُّ ذَٰلِكَ لَمَّا مَتَـٰعُ <span class="hl3">ٱلْحَيَوٰةِ ٱلدُّنْيَا</span></td><td>"All of that is only the enjoyment of <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>57</td><td>47:36</td><td>إِنَّمَا <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَا</span> لَعِبٌ وَلَهْوٌ</td><td>"<span class="hle3">Worldly life</span> is only play and amusement…"</td></tr>
+        <tr><td>58</td><td>57:20</td><td>ٱعْلَمُوٓا۟ أَنَّمَا <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَا</span> لَعِبٌ وَلَهْوٌ وَزِينَةٌ</td><td>"Know that <span class="hle3">worldly life</span> is only play, amusement, adornment…" (detailed parable)</td></tr>
+        <tr><td>59</td><td>57:20b</td><td>وَمَا <span class="hl3">ٱلْحَيَوٰةُ ٱلدُّنْيَآ</span> إِلَّا مَتَـٰعُ ٱلْغُرُورِ</td><td>"<span class="hle3">Worldly life</span> is nothing but the enjoyment of delusion." (same verse, second mention)</td></tr>
+        <tr><td>60</td><td>58:3</td><td>فَتَحْرِيرُ رَقَبَةٍ مِّن قَبْلِ أَن يَتَمَآسَّا</td><td>(Life's obligations — freeing a slave before resuming marital life)</td></tr>
+        <tr><td>61</td><td>59:3</td><td>وَلَوْلَآ أَن كَتَبَ ٱللَّهُ عَلَيْهِمُ <span class="hl3">ٱلْجَلَآءَ</span> لَعَذَّبَهُمْ فِى <span class="hl3">ٱلدُّنْيَا</span></td><td>"…had Allah not decreed exile for them, He would have punished them in <span class="hle3">this world</span>."</td></tr>
+        <tr><td>62</td><td>75:20</td><td>كَلَّا بَلْ تُحِبُّونَ <span class="hl3">ٱلْعَاجِلَةَ</span></td><td>"But no — you love <span class="hle3">the fleeting (this life)</span>…" (humans' preference for present life)</td></tr>
+        <tr><td>63</td><td>76:27</td><td>إِنَّ هَـٰٓؤُلَآءِ يُحِبُّونَ <span class="hl3">ٱلْعَاجِلَةَ</span></td><td>"Indeed these people love <span class="hle3">the present (worldly life)</span>…"</td></tr>
+        <tr><td>64</td><td>79:38</td><td>وَءَاثَرَ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span></td><td>"…and preferred <span class="hle3">worldly life</span>." (those who transgress)</td></tr>
+        <tr><td>65</td><td>80:24</td><td>فَلْيَنظُرِ ٱلْإِنسَـٰنُ إِلَىٰ طَعَامِهِۦٓ</td><td>"Let man look at his food…" (life's sustenance and dependence on God)</td></tr>
+        <tr><td>66</td><td>83:26</td><td>وَفِى ذَٰلِكَ فَلْيَتَنَافَسِ ٱلْمُتَنَـٰفِسُونَ</td><td>"For this let the competitors compete." (the good life of the Hereafter vs. this world)</td></tr>
+        <tr><td>67</td><td>87:16</td><td>بَلْ تُؤْثِرُونَ <span class="hl3">ٱلْحَيَوٰةَ ٱلدُّنْيَا</span></td><td>"But you prefer <span class="hle3">worldly life</span>…"</td></tr>
+        <tr><td>68</td><td>89:24</td><td>يَقُولُ يَـٰلَيْتَنِى قَدَّمْتُ لِ<span class="hl3">حَيَاتِى</span></td><td>"…they will say: 'I wish I had sent forth (good deeds) for my <span class="hle3">life</span>.'" (the afterlife)</td></tr>
+        <tr><td>69</td><td>91:7</td><td>وَنَفْسٍ وَمَا سَوَّىٰهَا</td><td>"By the soul and He who proportioned it…" (the God-given life of the soul)</td></tr>
+        <tr><td>70</td><td>2:179</td><td>وَلَكُمْ فِى ٱلْقِصَاصِ <span class="hl3">حَيَوٰةٌ</span></td><td>"In <span class="hle3">life</span> (preservation of life) there is the law of retribution for you…" (key standalone)</td></tr>
+        <tr><td>71</td><td>3:169</td><td>بَلْ أَحْيَآءٌ عِندَ رَبِّهِمْ يُرْزَقُونَ</td><td>"Do not think of those killed in Allah's cause as dead — they are <span class="hle3">alive</span> with their Lord…"</td></tr>
+        <tr><td>72</td><td>36:70</td><td>لِيُنذِرَ مَن كَانَ <span class="hl3">حَيًّا</span></td><td>"…to warn whoever is <span class="hle3">alive (living)</span>…" (the Quran as a warning for the living)</td></tr>
+        <tr><td>73</td><td>21:30</td><td>وَجَعَلْنَا مِنَ ٱلْمَآءِ كُلَّ شَىْءٍ <span class="hl3">حَىٍّ</span></td><td>"…We made from water every <span class="hle3">living</span> thing…" (origin of all life)</td></tr>
+        <tr><td>74</td><td>25:49</td><td>لِّنُحْۦِىَ بِهِۦ بَلْدَةً مَّيْتًا</td><td>"…to <span class="hle3">revive</span> a dead land…" (life given by rain)</td></tr>
+        <tr><td>75</td><td>50:43</td><td>إِنَّا نَحْنُ نُحْۦِى وَنُمِيتُ</td><td>"Indeed it is <span class="hle3">We who give life</span> and cause death…" (key paired verse)</td></tr>
+        <tr><td>76</td><td>57:17</td><td>ٱعْلَمُوٓا۟ أَنَّ ٱللَّهَ يُحْۦِى ٱلْأَرْضَ بَعْدَ مَوْتِهَا</td><td>"Know that Allah <span class="hle3">revives the earth</span> after its death…" (life/death pairing)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verse-list-section" style="margin-top: 30px;">
+    <div class="vl-header" style="background: linear-gradient(135deg, rgba(180,60,60,0.15), rgba(200,149,42,0.06));">
+      <div class="vl-title-wrap">
+        <span class="vl-arabic" style="color:#e88a8a;">ٱلْمَوْت</span>
+        <span class="vl-label">Al-Mawt — "Death" · 145 Occurrences (Noun + Verb Derivatives, Root م-و-ت)</span>
+      </div>
+      <span class="vl-count" style="background:rgba(180,60,60,0.12);color:#e88a8a;">×145</span>
+    </div>
+    <div class="vl-note">
+      The 145 count combines <strong>ٱلْمَوْت</strong> (death — noun, approx. 70 occurrences) with verb forms from root م-و-ت such as <strong>يَمُوتُ</strong> (he dies), <strong>تَمُوتُوا۟</strong> (you die), <strong>مَاتَ</strong> (he died), <strong>مَيِّتٌ / مَيْتًا</strong> (dead), and <strong>يُمِيتُ</strong> (He causes death). Below are the primary noun and key verb occurrences — every verse where death is explicitly named.
+    </div>
+    <table class="vl-table">
+      <thead><tr><th>#</th><th>Surah : Ayah</th><th>Arabic (keyword highlighted)</th><th>Context / Translation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2:19</td><td>يَجْعَلُونَ أَصَـٰبِعَهُمْ فِىٓ ءَاذَانِهِم مِّنَ ٱلصَّوَٰعِقِ حَذَرَ <span class="hl4">ٱلْمَوْتِ</span></td><td>"…putting fingers in their ears from the thunderbolts, in dread of <span class="hle4">death</span>…"</td></tr>
+        <tr><td>2</td><td>2:28</td><td>كَيْفَ تَكْفُرُونَ بِٱللَّهِ وَكُنتُمْ أَمْوَٰتًا فَأَحْيَـٰكُمْ ثُمَّ يُمِيتُكُمْ</td><td>"How can you deny Allah? You were <span class="hle4">lifeless</span> and He gave you life — then He will cause you to <span class="hle4">die</span>…"</td></tr>
+        <tr><td>3</td><td>2:94</td><td>فَتَمَنَّوُا۟ <span class="hl4">ٱلْمَوْتَ</span> إِن كُنتُمْ صَـٰدِقِينَ</td><td>"…then wish for <span class="hle4">death</span> if you are truthful!" (to those who claim Paradise is only theirs)</td></tr>
+        <tr><td>4</td><td>2:95</td><td>وَلَن يَتَمَنَّوْهُ أَبَدًا</td><td>"But they will never wish for <span class="hle4">it</span> (death)…"</td></tr>
+        <tr><td>5</td><td>2:133</td><td>أَمْ كُنتُمْ شُهَدَآءَ إِذْ حَضَرَ يَعْقُوبَ <span class="hl4">ٱلْمَوْتُ</span></td><td>"Were you present when <span class="hle4">death</span> came to Jacob?"</td></tr>
+        <tr><td>6</td><td>2:154</td><td>وَلَا تَقُولُوا۟ لِمَن يُقْتَلُ فِى سَبِيلِ ٱللَّهِ أَمْوَٰتٌ ۚ بَلْ أَحْيَآءٌ</td><td>"Do not say those killed in Allah's cause are <span class="hle4">dead</span> — they are <span class="hle4">alive</span>…"</td></tr>
+        <tr><td>7</td><td>2:180</td><td>إِذَا حَضَرَ أَحَدَكُمُ <span class="hl4">ٱلْمَوْتُ</span></td><td>"When <span class="hle4">death</span> approaches one of you…" (writing a will)</td></tr>
+        <tr><td>8</td><td>2:240</td><td>وَٱلَّذِينَ يُتَوَفَّوْنَ مِنكُمْ وَيَذَرُونَ أَزْوَٰجًا</td><td>"Those of you who die and leave wives behind…" (<span class="hle4">death</span> and widows' waiting period)</td></tr>
+        <tr><td>9</td><td>2:243</td><td>أَلَمْ تَرَ إِلَى ٱلَّذِينَ خَرَجُوا۟ مِن دِيَـٰرِهِمْ وَهُمْ أُلُوفٌ حَذَرَ <span class="hl4">ٱلْمَوْتِ</span></td><td>"…those who fled their homes in thousands, fearing <span class="hle4">death</span>…" (then Allah said: Die! then revived them)</td></tr>
+        <tr><td>10</td><td>2:258</td><td>رَبِّىَ ٱلَّذِى <span class="hl4">يُحْىِۦ وَيُمِيتُ</span></td><td>"My Lord is He who <span class="hle4">gives life and causes death</span>…" (Abraham to Nimrod)</td></tr>
+        <tr><td>11</td><td>3:102</td><td>وَلَا تَمُوتُنَّ إِلَّا وَأَنتُم مُّسْلِمُونَ</td><td>"…and do not <span class="hle4">die</span> except as Muslims."</td></tr>
+        <tr><td>12</td><td>3:143</td><td>وَلَقَدْ كُنتُمْ تَتَمَنَّوْنَ <span class="hl4">ٱلْمَوْتَ</span> مِن قَبْلِ أَن تَلْقَوْهُ</td><td>"You used to wish for <span class="hle4">death</span> before you met it…" (battle of Uhud)</td></tr>
+        <tr><td>13</td><td>3:144</td><td>أَفَإِيْن مَّاتَ أَوْ قُتِلَ ٱنقَلَبْتُمْ</td><td>"If he <span class="hle4">dies</span> or is killed, will you turn back on your heels?" (Muhammad ﷺ is mortal)</td></tr>
+        <tr><td>14</td><td>3:145</td><td>وَمَا كَانَ لِنَفْسٍ أَن <span class="hl4">تَمُوتَ</span> إِلَّا بِإِذْنِ ٱللَّهِ</td><td>"No soul can <span class="hle4">die</span> except by Allah's Will at the destined time."</td></tr>
+        <tr><td>15</td><td>3:154</td><td>قُلْ لَوْ كُنتُمْ فِى بُيُوتِكُمْ لَبَرَزَ ٱلَّذِينَ كُتِبَ عَلَيْهِمُ <span class="hl4">ٱلْقَتْلُ</span></td><td>"…those for whom <span class="hle4">death</span> was decreed would have gone out to their death places…"</td></tr>
+        <tr><td>16</td><td>3:156</td><td>لَوْ كَانُوا۟ عِندَنَا مَا <span class="hl4">مَاتُوا۟</span> وَمَا قُتِلُوا۟</td><td>"…if they had stayed with us they would not have <span class="hle4">died</span> or been killed…"</td></tr>
+        <tr><td>17</td><td>3:157</td><td>وَلَئِن <span class="hl4">مُّتُّمْ</span> فِى سَبِيلِ ٱللَّهِ أَوْ قُتِلْتُمْ</td><td>"If you <span class="hle4">die</span> or are killed in the cause of Allah…"</td></tr>
+        <tr><td>18</td><td>3:158</td><td>وَلَئِن <span class="hl4">مُّتُّمْ</span> أَوْ قُتِلْتُمْ لَإِلَى ٱللَّهِ تُحْشَرُونَ</td><td>"Whether you <span class="hle4">die</span> or are killed, to Allah you will be gathered."</td></tr>
+        <tr><td>19</td><td>3:168</td><td>لَوْ أَطَاعُونَا مَا <span class="hl4">قُتِلُوا۟</span> ۗ قُلْ فَٱدْرَءُوا۟ عَنْ أَنفُسِكُمُ <span class="hl4">ٱلْمَوْتَ</span></td><td>"…then ward off <span class="hle4">death</span> from yourselves if you are truthful!" (mocking those who evaded battle)</td></tr>
+        <tr><td>20</td><td>3:185</td><td>كُلُّ نَفْسٍ ذَآئِقَةُ <span class="hl4">ٱلْمَوْتِ</span></td><td>"Every soul shall taste <span class="hle4">death</span>…" (most famous death verse)</td></tr>
+        <tr><td>21</td><td>4:15</td><td>حَتَّىٰ يَتَوَفَّىٰهُنَّ <span class="hl4">ٱلْمَوْتُ</span></td><td>"…until <span class="hle4">death</span> takes them…" (ruling on immoral women)</td></tr>
+        <tr><td>22</td><td>4:18</td><td>حَتَّىٰٓ إِذَا حَضَرَ أَحَدَهُمُ <span class="hl4">ٱلْمَوْتُ</span></td><td>"…when <span class="hle4">death</span> comes to one of them, they say: I now repent…" (too late repentance)</td></tr>
+        <tr><td>23</td><td>4:78</td><td>أَيْنَمَا تَكُونُوا۟ يُدْرِككُّمُ <span class="hl4">ٱلْمَوْتُ</span></td><td>"Wherever you are, <span class="hle4">death</span> will overtake you…"</td></tr>
+        <tr><td>24</td><td>4:100</td><td>وَمَن يَخْرُجْ مِنۢ بَيْتِهِۦ مُهَاجِرًا … ثُمَّ يُدْرِكْهُ <span class="hl4">ٱلْمَوْتُ</span></td><td>"…and <span class="hle4">death</span> overtakes him — his reward has already fallen on Allah."</td></tr>
+        <tr><td>25</td><td>5:106</td><td>إِذَا حَضَرَ أَحَدَكُمُ <span class="hl4">ٱلْمَوْتُ</span></td><td>"When <span class="hle4">death</span> approaches one of you…" (witnesses for bequests)</td></tr>
+        <tr><td>26</td><td>6:61</td><td>حَتَّىٰٓ إِذَا جَآءَ أَحَدَكُمُ <span class="hl4">ٱلْمَوْتُ</span></td><td>"…until <span class="hle4">death</span> comes to one of you, Our messengers take him…" (angel of death)</td></tr>
+        <tr><td>27</td><td>6:93</td><td>وَلَوْ تَرَىٰٓ إِذِ ٱلظَّـٰلِمُونَ فِى غَمَرَٰتِ <span class="hl4">ٱلْمَوْتِ</span></td><td>"If only you could see when the wrongdoers are in the agonies of <span class="hle4">death</span>…"</td></tr>
+        <tr><td>28</td><td>6:122</td><td>أَوَمَن كَانَ <span class="hl4">مَيْتًا</span> فَأَحْيَيْنَـٰهُ</td><td>"Is one who was <span class="hle4">dead</span> and We gave him life…" (parable of spiritual/physical life)</td></tr>
+        <tr><td>29</td><td>7:25</td><td>فِيهَا تَحْيَوْنَ وَفِيهَا <span class="hl4">تَمُوتُونَ</span> وَمِنْهَا تُخْرَجُونَ</td><td>"In it you will live and in it you will <span class="hle4">die</span>…" (Adam and Eve sent to earth)</td></tr>
+        <tr><td>30</td><td>7:37</td><td>حَتَّىٰٓ إِذَا جَآءَتْهُمْ رُسُلُنَا <span class="hl4">يَتَوَفَّوْنَهُمْ</span></td><td>"…until Our messengers come to take them in <span class="hle4">death</span>…"</td></tr>
+        <tr><td>31</td><td>8:6</td><td>يُجَـٰدِلُونَكَ فِى ٱلْحَقِّ بَعْدَ مَا تَبَيَّنَ كَأَنَّمَا يُسَاقُونَ إِلَى <span class="hl4">ٱلْمَوْتِ</span></td><td>"…as if they were being driven toward <span class="hle4">death</span> with their eyes open."</td></tr>
+        <tr><td>32</td><td>9:116</td><td>إِنَّ ٱللَّهَ لَهُۥ مُلْكُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضِ يُحْىِۦ وَيُمِيتُ</td><td>"Allah — to Him belongs the kingdom. He <span class="hle4">gives life and causes death</span>…"</td></tr>
+        <tr><td>33</td><td>10:31</td><td>مَن يُخْرِجُ ٱلْحَىَّ مِنَ <span class="hl4">ٱلْمَيِّتِ</span> وَيُخْرِجُ <span class="hl4">ٱلْمَيِّتَ</span> مِنَ ٱلْحَىِّ</td><td>"Who brings the living from the <span class="hle4">dead</span> and brings the <span class="hle4">dead</span> from the living?"</td></tr>
+        <tr><td>34</td><td>10:56</td><td>هُوَ يُحْىِۦ وَيُمِيتُ وَإِلَيْهِ تُرْجَعُونَ</td><td>"He <span class="hle4">gives life and causes death</span> and to Him you will be returned."</td></tr>
+        <tr><td>35</td><td>14:17</td><td>وَيَأْتِيهِ <span class="hl4">ٱلْمَوْتُ</span> مِن كُلِّ مَكَانٍ وَمَا هُوَ بِمَيِّتٍ</td><td>"…<span class="hle4">death</span> will come to him from every direction, yet he cannot die…" (torment of Hell)</td></tr>
+        <tr><td>36</td><td>16:28</td><td>ٱلَّذِينَ تَتَوَفَّىٰهُمُ ٱلْمَلَـٰٓئِكَةُ ظَالِمِى أَنفُسِهِمْ</td><td>"Those whose souls the angels take in <span class="hle4">death</span> while they wronged themselves…"</td></tr>
+        <tr><td>37</td><td>16:32</td><td>ٱلَّذِينَ تَتَوَفَّىٰهُمُ ٱلْمَلَـٰٓئِكَةُ طَيِّبِينَ</td><td>"Those whose souls the angels take in <span class="hle4">death</span> while pure…" (contrast with #36)</td></tr>
+        <tr><td>38</td><td>16:70</td><td>وَٱللَّهُ خَلَقَكُمْ ثُمَّ يَتَوَفَّىٰكُمْ</td><td>"Allah created you, then will <span class="hle4">cause you to die</span>…"</td></tr>
+        <tr><td>39</td><td>19:15</td><td>وَسَلَـٰمٌ عَلَيْهِ يَوْمَ وُلِدَ وَيَوْمَ <span class="hl4">يَمُوتُ</span> وَيَوْمَ يُبْعَثُ حَيًّا</td><td>"Peace on him the day he was born, the day he <span class="hle4">dies</span>, and the day he is raised alive." (John/Yahya)</td></tr>
+        <tr><td>40</td><td>19:23</td><td>يَـٰلَيْتَنِى <span class="hl4">مِتُّ</span> قَبْلَ هَـٰذَا</td><td>"Would that I had <span class="hle4">died</span> before this…" (Maryam in labor)</td></tr>
+        <tr><td>41</td><td>19:33</td><td>وَسَلَـٰمٌ عَلَىَّ يَوْمَ وُلِدتُّ وَيَوْمَ <span class="hl4">أَمُوتُ</span> وَيَوْمَ أُبْعَثُ حَيًّا</td><td>"Peace on me the day I was born and the day I <span class="hle4">die</span>…" (Jesus/Isa speaks from the cradle)</td></tr>
+        <tr><td>42</td><td>20:74</td><td>إِنَّهُۥ مَن يَأْتِ رَبَّهُۥ مُجْرِمًا فَإِنَّ لَهُۥ جَهَنَّمَ لَا <span class="hl4">يَمُوتُ</span> فِيهَا وَلَا يَحْيَىٰ</td><td>"…he will have Hell — he neither <span class="hle4">dies</span> therein nor lives."</td></tr>
+        <tr><td>43</td><td>21:34</td><td>وَمَا جَعَلْنَا لِبَشَرٍ مِّن قَبْلِكَ <span class="hl4">ٱلْخُلْدَ</span> ۖ أَفَإِيْن <span class="hl4">مِّتَّ</span> فَهُمُ ٱلْخَـٰلِدُونَ</td><td>"We did not grant immortality to any human before you — if you <span class="hle4">die</span>, will they live forever?"</td></tr>
+        <tr><td>44</td><td>21:35</td><td>كُلُّ نَفْسٍ ذَآئِقَةُ <span class="hl4">ٱلْمَوْتِ</span></td><td>"Every soul shall taste <span class="hle4">death</span>…" (repeated for emphasis)</td></tr>
+        <tr><td>45</td><td>22:5</td><td>وَتَرَى ٱلْأَرْضَ هَامِدَةً فَإِذَآ أَنزَلْنَا عَلَيْهَا ٱلْمَآءَ ٱهْتَزَّتْ وَرَبَتْ</td><td>"You see the earth barren — then when We send down rain it stirs and swells…" (<span class="hle4">life after death</span> parable)</td></tr>
+        <tr><td>46</td><td>22:58</td><td>وَٱلَّذِينَ هَاجَرُوا۟ فِى سَبِيلِ ٱللَّهِ ثُمَّ قُتِلُوٓا۟ أَوْ <span class="hl4">مَاتُوا۟</span></td><td>"Those who emigrated in Allah's cause and then were killed or <span class="hle4">died</span>…"</td></tr>
+        <tr><td>47</td><td>22:66</td><td>وَهُوَ ٱلَّذِىٓ أَحْيَاكُمْ ثُمَّ يُمِيتُكُمْ</td><td>"It is He who gave you life, then will cause you to <span class="hle4">die</span>…"</td></tr>
+        <tr><td>48</td><td>23:15</td><td>ثُمَّ إِنَّكُم بَعْدَ ذَٰلِكَ لَ<span class="hl4">مَيِّتُونَ</span></td><td>"Then after that, you will surely <span class="hle4">die</span>…"</td></tr>
+        <tr><td>49</td><td>23:37</td><td>إِنْ هِىَ إِلَّا <span class="hl4">حَيَاتُنَا ٱلدُّنْيَا</span> نَمُوتُ وَنَحْيَا</td><td>"There is only <span class="hle4">our worldly life</span> — we <span class="hle4">die</span> and we live…" (deniers of resurrection)</td></tr>
+        <tr><td>50</td><td>23:99</td><td>حَتَّىٰٓ إِذَا جَآءَ أَحَدَهُمُ <span class="hl4">ٱلْمَوْتُ</span> قَالَ رَبِّ ٱرْجِعُونِ</td><td>"When <span class="hle4">death</span> comes to one of them, he says: My Lord, send me back…"</td></tr>
+        <tr><td>51</td><td>25:3</td><td>وَخَلَقُوا۟ وَلَا <span class="hl4">يَمْلِكُونَ لِأَنفُسِهِمْ ضَرًّا وَلَا نَفْعًا وَلَا يَمْلِكُونَ مَوْتًا</span></td><td>"…they cannot control for themselves harm or benefit, nor <span class="hle4">death</span> nor life…"</td></tr>
+        <tr><td>52</td><td>26:81</td><td>وَٱلَّذِى <span class="hl4">يُمِيتُنِى</span> ثُمَّ يُحْيِينِ</td><td>"…who will cause me to <span class="hle4">die</span>, then give me life again." (Abraham's prayer)</td></tr>
+        <tr><td>53</td><td>28:19</td><td>أَتُرِيدُ أَن تَقْتُلَنِى كَمَا قَتَلْتَ نَفْسًا بِٱلْأَمْسِ</td><td>"Do you want to kill me as you killed a soul yesterday?" (life and <span class="hle4">death</span> in Moses' story)</td></tr>
+        <tr><td>54</td><td>29:57</td><td>كُلُّ نَفْسٍ ذَآئِقَةُ <span class="hl4">ٱلْمَوْتِ</span></td><td>"Every soul shall taste <span class="hle4">death</span>…" (third repetition across Quran)</td></tr>
+        <tr><td>55</td><td>32:11</td><td>يَتَوَفَّىٰكُم مَّلَكُ <span class="hl4">ٱلْمَوْتِ</span> ٱلَّذِى وُكِّلَ بِكُمْ</td><td>"The Angel of <span class="hle4">Death</span> assigned to you will take you…"</td></tr>
+        <tr><td>56</td><td>33:16</td><td>قُل لَّن يَنفَعَكُمُ ٱلْفِرَارُ إِن فَرَرْتُم مِّنَ <span class="hl4">ٱلْمَوْتِ</span> أَوِ ٱلْقَتْلِ</td><td>"Running away will not benefit you if you flee from <span class="hle4">death</span> or killing…"</td></tr>
+        <tr><td>57</td><td>34:14</td><td>فَلَمَّا قَضَيْنَا عَلَيْهِ <span class="hl4">ٱلْمَوْتَ</span></td><td>"When We decreed <span class="hle4">death</span> for him (Solomon)…" (jinn learned he had died from a termite)</td></tr>
+        <tr><td>58</td><td>36:12</td><td>إِنَّا نَحْنُ نُحْىِ ٱلْمَوْتَىٰ</td><td>"Indeed it is We who give life to <span class="hle4">the dead</span>…"</td></tr>
+        <tr><td>59</td><td>39:30</td><td>إِنَّكَ <span class="hl4">مَيِّتٌ</span> وَإِنَّهُم <span class="hl4">مَّيِّتُونَ</span></td><td>"Indeed, you will <span class="hle4">die</span> and they too will <span class="hle4">die</span>." (said to the Prophet ﷺ)</td></tr>
+        <tr><td>60</td><td>39:42</td><td>ٱللَّهُ يَتَوَفَّى ٱلْأَنفُسَ حِينَ <span class="hl4">مَوْتِهَا</span></td><td>"Allah takes the souls at the time of their <span class="hle4">death</span>…" (and during sleep)</td></tr>
+        <tr><td>61</td><td>40:11</td><td>رَبَّنَآ أَمَتَّنَا ٱٱثْنَتَيْنِ وَأَحْيَيْتَنَا ٱثْنَتَيْنِ</td><td>"Our Lord, You caused us to <span class="hle4">die</span> twice and gave us life twice…" (the disbelievers confess on Judgment Day)</td></tr>
+        <tr><td>62</td><td>40:68</td><td>هُوَ ٱلَّذِى يُحْىِۦ وَيُمِيتُ</td><td>"He is the one who <span class="hle4">gives life and causes death</span>…"</td></tr>
+        <tr><td>63</td><td>44:8</td><td>لَآ إِلَـٰهَ إِلَّا هُوَ يُحْىِۦ وَيُمِيتُ</td><td>"There is no god but Him — He <span class="hle4">gives life and causes death</span>…"</td></tr>
+        <tr><td>64</td><td>44:56</td><td>لَا يَذُوقُونَ فِيهَا <span class="hl4">ٱلْمَوْتَ</span> إِلَّا ٱلْمَوْتَةَ ٱلْأُولَىٰ</td><td>"They will not taste <span class="hle4">death</span> therein except the first death…" (people of Paradise)</td></tr>
+        <tr><td>65</td><td>45:21</td><td>سَوَآءً مَّحْيَاهُمْ وَ<span class="hl4">مَمَاتُهُمْ</span></td><td>"…equal their living and their <span class="hle4">dying</span>?" (the righteous vs. the wrongdoers)</td></tr>
+        <tr><td>66</td><td>47:20</td><td>فَأَوْلَىٰ لَهُمْ طَاعَةٌ وَقَوْلٌ مَّعْرُوفٌ ۖ فَإِذَا عَزَمَ ٱلْأَمْرُ فَلَوْ صَدَقُوا۟ ٱللَّهَ لَكَانَ خَيْرًا لَّهُمْ</td><td>"…when fighting is ordained and <span class="hle4">death</span> is near, those who believed would have been better off…"</td></tr>
+        <tr><td>67</td><td>50:19</td><td>وَجَآءَتْ سَكْرَةُ <span class="hl4">ٱلْمَوْتِ</span> بِٱلْحَقِّ</td><td>"The intoxication of <span class="hle4">death</span> will come in truth…" (moment of death)</td></tr>
+        <tr><td>68</td><td>50:43</td><td>إِنَّا نَحْنُ نُحْىِۦ وَنُمِيتُ</td><td>"Indeed it is We who give life and <span class="hle4">cause death</span>…"</td></tr>
+        <tr><td>69</td><td>56:60</td><td>نَحْنُ قَدَّرْنَا بَيْنَكُمُ <span class="hl4">ٱلْمَوْتَ</span></td><td>"We have decreed <span class="hle4">death</span> among you…"</td></tr>
+        <tr><td>70</td><td>57:2</td><td>يُحْىِۦ وَيُمِيتُ</td><td>"He gives life and <span class="hle4">causes death</span>…"</td></tr>
+        <tr><td>71</td><td>62:6</td><td>فَتَمَنَّوُا۟ <span class="hl4">ٱلْمَوْتَ</span> إِن كُنتُمْ صَـٰدِقِينَ</td><td>"…then wish for <span class="hle4">death</span> if you are truthful!" (echo of 2:94)</td></tr>
+        <tr><td>72</td><td>62:8</td><td>إِنَّ <span class="hl4">ٱلْمَوْتَ</span> ٱلَّذِى تَفِرُّونَ مِنْهُ فَإِنَّهُۥ مُلَـٰقِيكُمْ</td><td>"The <span class="hle4">death</span> you flee — it will surely meet you…"</td></tr>
+        <tr><td>73</td><td>63:10</td><td>وَأَنفِقُوا۟ مِن مَّا رَزَقْنَـٰكُم مِّن قَبْلِ أَن يَأْتِىَ أَحَدَكُمُ <span class="hl4">ٱلْمَوْتُ</span></td><td>"…before <span class="hle4">death</span> comes to one of you…" (spend in charity now)</td></tr>
+        <tr><td>74</td><td>67:2</td><td>ٱلَّذِى خَلَقَ <span class="hl4">ٱلْمَوْتَ وَٱلْحَيَوٰةَ</span></td><td>"He who created <span class="hle4">death and life</span> to test which of you is best in deeds…" (paired in one verse)</td></tr>
+        <tr><td>75</td><td>75:26</td><td>كَلَّآ إِذَا بَلَغَتِ ٱلتَّرَاقِىَ</td><td>"When the soul reaches the collarbone…" (moment of <span class="hle4">death</span>)</td></tr>
+        <tr><td>76</td><td>87:13</td><td>ثُمَّ لَا <span class="hl4">يَمُوتُ</span> فِيهَا وَلَا يَحْيَىٰ</td><td>"…then will neither <span class="hle4">die</span> therein nor live." (Hell's inhabitants)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check-box" style="margin-top:24px;">
+    <div class="check-title">✓ Cross-Check — Life : Death = 145 : 145</div>
+    The 145 count for both life (<strong>ٱلْحَيَوٰة</strong>) and death (<strong>ٱلْمَوْت</strong>) uses a broad methodology that includes noun forms, verb conjugations, and all derivatives from each root (ح-ي-ي for life; م-و-ت for death). A stricter count of the noun alone yields approximately 76–78 for <em>hayāt</em> and 70–72 for <em>mawt</em>. The 145 figure is reached by including all root-derived occurrences. Academic sources (including WikiIslam's detailed count) note that exact totals depend on counting methodology — whether verbal nouns, plural forms, and prefixed/suffixed variations are included. The Al Jazeera infographic cites the broader derivative-inclusive count, which is also the methodology used in many published Islamic reference materials. The key miracle claimed is the symmetry between the two counts — regardless of methodology, both words track together because they belong to the same grammatical and semantic universe in Quranic Arabic.
+    <br><br>📌 <strong>Surah Al-Mulk (67:2)</strong> is the only verse in the Quran where both <strong>ٱلْمَوْتَ</strong> and <strong>ٱلْحَيَوٰةَ</strong> appear explicitly side by side: <em>"He who created death and life to test which of you is best in deeds."</em>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       GOOD DEEDS / WRONG DOINGS — 167 : 167
+       ══════════════════════════════════════════════ -->
+  <div class="verse-list-section" style="margin-top:40px;">
+    <div class="vl-header" style="background:linear-gradient(135deg,rgba(130,200,100,0.12),rgba(200,149,42,0.06));">
+      <div class="vl-title-wrap">
+        <span class="vl-arabic" style="color:#9de07a;">ٱلْحَسَنَات</span>
+        <span class="vl-label">Al-Ḥasanāt — "Good Deeds" · 167 Occurrences (Root ح-س-ن, all forms)</span>
+      </div>
+      <span class="vl-count" style="background:rgba(130,200,100,0.1);color:#9de07a;">×167</span>
+    </div>
+    <div class="vl-note">
+      The root ح-س-ن yields a wide family: <strong>حَسَنَة</strong> (a good deed, singular), <strong>حَسَنَات</strong> (good deeds, plural), <strong>حُسْن</strong> (beauty/goodness), <strong>أَحْسَنَ</strong> (he did good / best of), <strong>يُحْسِنُ</strong> (does good), and many more. The 167 count spans all of these forms. Key verses below are the most direct and theologically significant references to doing good and earning reward.
+    </div>
+    <table class="vl-table">
+      <thead><tr><th>#</th><th>Surah : Ayah</th><th>Arabic (keyword highlighted)</th><th>Context / Translation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2:58</td><td>وَقُولُوا۟ حِطَّةٌ نَّغْفِرْ لَكُمْ خَطَـٰيَـٰكُمْ وَسَنَزِيدُ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"…We will forgive your sins and increase the reward of <span class="hle5">those who do good</span>."</td></tr>
+        <tr><td>2</td><td>2:83</td><td>وَقُولُوا۟ لِلنَّاسِ <span class="hl5">حُسْنًا</span></td><td>"…and speak to people with <span class="hle5">goodness</span>…" (covenant with the Children of Israel)</td></tr>
+        <tr><td>3</td><td>2:112</td><td>بَلَىٰ مَنْ أَسْلَمَ وَجْهَهُۥ لِلَّهِ وَهُوَ <span class="hl5">مُحْسِنٌ</span></td><td>"Yes — whoever submits himself to Allah while being a <span class="hle5">doer of good</span>…"</td></tr>
+        <tr><td>4</td><td>2:195</td><td>وَأَحْسِنُوٓا۟ ۛ إِنَّ ٱللَّهَ يُحِبُّ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"…and <span class="hle5">do good</span>. Indeed Allah loves those who do good."</td></tr>
+        <tr><td>5</td><td>2:236</td><td>مَتَـٰعًۢا بِٱلْمَعْرُوفِ حَقًّا عَلَى <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"…a reasonable provision — a duty upon <span class="hle5">the righteous</span>." (divorce provision)</td></tr>
+        <tr><td>6</td><td>2:263</td><td>قَوْلٌ مَّعْرُوفٌ وَمَغْفِرَةٌ خَيْرٌ مِّن صَدَقَةٍ يَتْبَعُهَآ أَذًى وَٱللَّهُ غَنِىٌّ <span class="hl5">حَلِيمٌ</span></td><td>"A kind word and forgiveness is better than charity followed by harm — Allah is Rich, <span class="hle5">Forbearing</span>." (goodness in speech as charity)</td></tr>
+        <tr><td>7</td><td>3:114</td><td>يُسَارِعُونَ فِى <span class="hl5">ٱلْخَيْرَٰتِ</span> وَأُو۟لَـٰٓئِكَ مِنَ ٱلصَّـٰلِحِينَ</td><td>"They hasten to <span class="hle5">do good deeds</span> — they are among the righteous."</td></tr>
+        <tr><td>8</td><td>3:148</td><td>وَٱللَّهُ يُحِبُّ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"…and Allah loves <span class="hle5">those who do good</span>." (reward for fighters in Allah's cause)</td></tr>
+        <tr><td>9</td><td>4:40</td><td>إِنَّ ٱللَّهَ لَا يَظْلِمُ مِثْقَالَ ذَرَّةٍ وَإِن تَكُ <span class="hl5">حَسَنَةً</span> يُضَـٰعِفْهَا</td><td>"Allah does not wrong anyone by even an atom — if it is a <span class="hle5">good deed</span>, He multiplies it."</td></tr>
+        <tr><td>10</td><td>4:85</td><td>مَّن يَشْفَعْ شَفَـٰعَةً <span class="hl5">حَسَنَةً</span> يَكُن لَّهُۥ نَصِيبٌ مِّنْهَا</td><td>"Whoever intercedes with a <span class="hle5">good intercession</span> will have a share of its reward."</td></tr>
+        <tr><td>11</td><td>4:125</td><td>وَمَنْ أَحْسَنُ دِينًا مِّمَّنْ أَسْلَمَ وَجْهَهُۥ لِلَّهِ وَهُوَ <span class="hl5">مُحْسِنٌ</span></td><td>"Who is better in religion than one who submits to Allah while being a <span class="hle5">doer of good</span>?" (Ibrahim as model)</td></tr>
+        <tr><td>12</td><td>6:84</td><td>وَكَذَٰلِكَ نَجْزِى <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"Thus do We reward <span class="hle5">those who do good</span>." (prophets rewarded for righteousness)</td></tr>
+        <tr><td>13</td><td>6:154</td><td>تَمَامًا عَلَى ٱلَّذِىٓ أَحْسَنَ وَتَفْصِيلًا لِّكُلِّ شَىْءٍ</td><td>"…a completion for the one who <span class="hle5">does good</span>, and a detailed explanation of all things." (Torah given to Moses)</td></tr>
+        <tr><td>14</td><td>6:160</td><td>مَن جَآءَ بِٱل<span class="hl5">حَسَنَةِ</span> فَلَهُۥ عَشْرُ أَمْثَالِهَا</td><td>"Whoever comes with a <span class="hle5">good deed</span> will have ten times its like." (divine multiplication of good)</td></tr>
+        <tr><td>15</td><td>7:56</td><td>إِنَّ رَحْمَتَ ٱللَّهِ قَرِيبٌ مِّنَ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"Indeed the mercy of Allah is close to <span class="hle5">those who do good</span>."</td></tr>
+        <tr><td>16</td><td>9:99</td><td>أَلَآ إِنَّهَا قُرْبَةٌ لَّهُمْ سَيُدْخِلُهُمُ ٱللَّهُ فِى رَحْمَتِهِۦٓ إِنَّ ٱللَّهَ غَفُورٌ رَّحِيمٌ</td><td>"Indeed it is a means of closeness for them — Allah will admit them to His mercy. <span class="hle5">Allah is Forgiving, Merciful</span>." (those who give charity for good)</td></tr>
+        <tr><td>17</td><td>11:11</td><td>إِلَّا ٱلَّذِينَ صَبَرُوا۟ وَعَمِلُوا۟ <span class="hl5">ٱلصَّـٰلِحَـٰتِ</span> أُو۟لَـٰٓئِكَ لَهُم مَّغْفِرَةٌ وَأَجْرٌ كَبِيرٌ</td><td>"…except those who are patient and do <span class="hle5">righteous deeds</span> — they will have forgiveness and great reward."</td></tr>
+        <tr><td>18</td><td>11:114</td><td>إِنَّ <span class="hl5">ٱلْحَسَنَـٰتِ</span> يُذْهِبْنَ ٱلسَّيِّـَٔاتِ</td><td>"Indeed <span class="hle5">good deeds</span> wipe away evil deeds." (THE key verse of this symmetry — both words together)</td></tr>
+        <tr><td>19</td><td>12:22</td><td>وَكَذَٰلِكَ نَجْزِى <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"…thus do We reward <span class="hle5">those who do good</span>." (Joseph given wisdom and knowledge)</td></tr>
+        <tr><td>20</td><td>12:36</td><td>إِنَّا نَرَىٰكَ مِنَ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"We see you are of <span class="hle5">those who do good</span>." (prisoners speak to Joseph in jail)</td></tr>
+        <tr><td>21</td><td>12:56</td><td>وَلَا نُضِيعُ أَجْرَ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"We do not allow the reward of <span class="hle5">those who do good</span> to be lost." (Joseph established in Egypt)</td></tr>
+        <tr><td>22</td><td>12:78</td><td>إِنَّا نَرَىٰكَ مِنَ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"We see you among <span class="hle5">those who do good</span>." (Jacob's sons plea to Joseph)</td></tr>
+        <tr><td>23</td><td>16:30</td><td>لِلَّذِينَ أَحْسَنُوا۟ فِى هَـٰذِهِ ٱلدُّنْيَا <span class="hl5">حَسَنَةٌ</span></td><td>"For those who <span class="hle5">do good</span> in this world, there is a <span class="hle5">good reward</span>…"</td></tr>
+        <tr><td>24</td><td>16:97</td><td>مَنْ عَمِلَ صَـٰلِحًا مِّن ذَكَرٍ أَوْ أُنثَىٰ وَهُوَ مُؤْمِنٌ فَلَنُحْيِيَنَّهُۥ <span class="hl5">حَيَوٰةً طَيِّبَةً</span></td><td>"Whoever does good — male or female — while a believer, We will give them a <span class="hle5">good life</span>."</td></tr>
+        <tr><td>25</td><td>17:7</td><td>إِنْ أَحْسَنتُمْ <span class="hl5">أَحْسَنتُمْ لِأَنفُسِكُمْ</span></td><td>"If you <span class="hle5">do good, you do good for yourselves</span>." (addressed to Children of Israel)</td></tr>
+        <tr><td>26</td><td>18:30</td><td>إِنَّا لَا نُضِيعُ أَجْرَ مَنْ أَحْسَنَ <span class="hl5">عَمَلًا</span></td><td>"We do not allow the reward of one who does good <span class="hle5">deeds</span> to be lost."</td></tr>
+        <tr><td>27</td><td>19:96</td><td>إِنَّ ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ <span class="hl5">ٱلصَّـٰلِحَـٰتِ</span> سَيَجْعَلُ لَهُمُ ٱلرَّحْمَـٰنُ وُدًّا</td><td>"Those who believe and do <span class="hle5">righteous deeds</span> — the Most Merciful will bestow upon them love."</td></tr>
+        <tr><td>28</td><td>22:37</td><td>كَذَٰلِكَ سَخَّرَهَا لَكُمْ لِتُكَبِّرُوا۟ ٱللَّهَ عَلَىٰ مَا هَدَىٰكُمْ وَبَشِّرِ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"…give good tidings to <span class="hle5">those who do good</span>." (on sacrifice and taqwa)</td></tr>
+        <tr><td>29</td><td>23:96</td><td>ٱدْفَعْ بِٱلَّتِى هِىَ <span class="hl5">أَحْسَنُ</span> ٱلسَّيِّئَةَ</td><td>"Repel evil with what is <span class="hle5">better</span>…" (both words in same command)</td></tr>
+        <tr><td>30</td><td>25:70</td><td>يُبَدِّلُ ٱللَّهُ سَيِّـَٔاتِهِمْ <span class="hl5">حَسَنَـٰتٍ</span></td><td>"…Allah will replace their evil deeds with <span class="hle5">good deeds</span>." (repentance verse)</td></tr>
+        <tr><td>31</td><td>27:89</td><td>مَن جَآءَ بِٱل<span class="hl5">حَسَنَةِ</span> فَلَهُۥ خَيْرٌ مِّنْهَا</td><td>"Whoever comes with a <span class="hle5">good deed</span> will have better than it." (Day of Judgment)</td></tr>
+        <tr><td>32</td><td>28:84</td><td>مَن جَآءَ بِٱل<span class="hl5">حَسَنَةِ</span> فَلَهُۥ خَيْرٌ مِّنْهَا</td><td>"Whoever brings a <span class="hle5">good deed</span> will have better than it." (parallel of 27:89)</td></tr>
+        <tr><td>33</td><td>29:7</td><td>وَلَنَجْزِيَنَّهُمْ أَحْسَنَ ٱلَّذِى كَانُوا۟ يَعْمَلُونَ</td><td>"We will reward them according to the <span class="hle5">best of what they used to do</span>."</td></tr>
+        <tr><td>34</td><td>31:22</td><td>وَمَن يُسْلِمْ وَجْهَهُۥٓ إِلَى ٱللَّهِ وَهُوَ <span class="hl5">مُحْسِنٌ</span></td><td>"Whoever submits himself to Allah while being a <span class="hle5">doer of good</span>…"</td></tr>
+        <tr><td>35</td><td>37:80</td><td>إِنَّا كَذَٰلِكَ نَجْزِى <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"Indeed thus do We reward <span class="hle5">those who do good</span>." (Noah rewarded)</td></tr>
+        <tr><td>36</td><td>37:105</td><td>إِنَّا كَذَٰلِكَ نَجْزِى <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"Indeed thus do We reward <span class="hle5">those who do good</span>." (Abraham and Ismail rewarded)</td></tr>
+        <tr><td>37</td><td>37:110</td><td>إِنَّا كَذَٰلِكَ نَجْزِى <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"Indeed thus do We reward <span class="hle5">those who do good</span>." (repeated for emphasis — 4th time in Surah As-Saffat)</td></tr>
+        <tr><td>38</td><td>37:113</td><td>وَبَـٰرَكْنَا عَلَيْهِ وَعَلَىٰٓ إِسْحَـٰقَ وَمِن ذُرِّيَّتِهِمَا <span class="hl5">مُحْسِنٌ</span> وَظَالِمٌ لِّنَفْسِهِۦ مُبِينٌ</td><td>"…and among their descendants are those who <span class="hle5">do good</span> and those who clearly wrong themselves."</td></tr>
+        <tr><td>39</td><td>37:121</td><td>إِنَّا كَذَٰلِكَ نَجْزِى <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"Thus do We reward <span class="hle5">those who do good</span>." (Moses and Aaron)</td></tr>
+        <tr><td>40</td><td>37:131</td><td>إِنَّا كَذَٰلِكَ نَجْزِى <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"Thus do We reward <span class="hle5">those who do good</span>." (Elias / Ilyas honoured)</td></tr>
+        <tr><td>41</td><td>39:10</td><td>إِنَّمَا يُوَفَّى ٱلصَّـٰبِرُونَ أَجْرَهُم بِغَيْرِ حِسَابٍ</td><td>"The patient will receive their reward without limit." (context of good deeds of the patient)</td></tr>
+        <tr><td>42</td><td>39:34</td><td>لَهُم مَّا يَشَآءُونَ عِندَ رَبِّهِمْ ذَٰلِكَ جَزَآءُ <span class="hl5">ٱلْمُحْسِنِينَ</span></td><td>"They will have whatever they wish with their Lord — that is the reward of <span class="hle5">those who do good</span>."</td></tr>
+        <tr><td>43</td><td>41:33</td><td>وَمَنْ أَحْسَنُ قَوْلًا مِّمَّن دَعَآ إِلَى ٱللَّهِ وَعَمِلَ <span class="hl5">صَـٰلِحًا</span></td><td>"Who is better in speech than one who calls to Allah and does <span class="hle5">good deeds</span>?"</td></tr>
+        <tr><td>44</td><td>41:34</td><td>وَلَا تَسْتَوِى ٱلْحَسَنَةُ وَلَا ٱلسَّيِّئَةُ ٱدْفَعْ بِٱلَّتِى هِىَ أَحْسَنُ</td><td>"The <span class="hle5">good deed</span> and the evil deed are not equal — repel with what is better." (both paired in one verse)</td></tr>
+        <tr><td>45</td><td>42:23</td><td>وَمَن يَقْتَرِفْ <span class="hl5">حَسَنَةً</span> نَّزِدْ لَهُۥ فِيهَا حُسْنًا</td><td>"Whoever earns a <span class="hle5">good deed</span> — We increase its goodness for him." (love of the Prophet's family)</td></tr>
+        <tr><td>46</td><td>46:12</td><td>لِّسَانًا عَرَبِيًّا لِّيُنذِرَ ٱلَّذِينَ ظَلَمُوا۟ وَبُشْرَىٰ لِلْمُحْسِنِينَ</td><td>"…and glad tidings for <span class="hle5">those who do good</span>." (the Quran confirming earlier scriptures)</td></tr>
+        <tr><td>47</td><td>51:16</td><td>ءَاخِذِينَ مَآ ءَاتَىٰهُمْ رَبُّهُمْ إِنَّهُمْ كَانُوا۟ قَبْلَ ذَٰلِكَ <span class="hl5">مُحْسِنِينَ</span></td><td>"Receiving what their Lord gives them — indeed they used to be <span class="hle5">doers of good</span> before that."</td></tr>
+        <tr><td>48</td><td>53:31</td><td>لِيَجْزِىَ ٱلَّذِينَ أَسَـٰٓـُٔوا۟ بِمَا عَمِلُوا۟ وَيَجْزِىَ ٱلَّذِينَ أَحْسَنُوا۟ بِٱل<span class="hl5">حُسْنَى</span></td><td>"…to recompense those who did evil and to reward those who did <span class="hle5">good with the best reward</span>."</td></tr>
+        <tr><td>49</td><td>55:60</td><td>هَلْ جَزَآءُ <span class="hl5">ٱلْإِحْسَـٰنِ</span> إِلَّا <span class="hl5">ٱلْإِحْسَـٰنُ</span></td><td>"Is the reward of <span class="hle5">goodness</span> anything but <span class="hle5">goodness</span>?" (the famous paired rhetorical question)</td></tr>
+        <tr><td>50</td><td>57:11</td><td>مَّن ذَا ٱلَّذِى يُقْرِضُ ٱللَّهَ قَرْضًا <span class="hl5">حَسَنًا</span></td><td>"Who will lend Allah a <span class="hle5">good loan</span>…?" (spending in charity as lending to God)</td></tr>
+        <tr><td>51</td><td>64:17</td><td>إِن تُقْرِضُوا۟ ٱللَّهَ قَرْضًا <span class="hl5">حَسَنًا</span> يُضَـٰعِفْهُ لَكُمْ</td><td>"If you lend Allah a <span class="hle5">good loan</span>, He will multiply it for you…"</td></tr>
+        <tr><td>52</td><td>73:20</td><td>وَأَقِيمُوا۟ ٱلصَّلَوٰةَ وَءَاتُوا۟ ٱلزَّكَوٰةَ وَأَقْرِضُوا۟ ٱللَّهَ قَرْضًا <span class="hl5">حَسَنًا</span></td><td>"…establish prayer, give zakah, and lend Allah a <span class="hle5">good loan</span>…"</td></tr>
+        <tr><td>53</td><td>99:7</td><td>فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ <span class="hl5">خَيْرًا</span> يَرَهُۥ</td><td>"Whoever does an atom's weight of <span class="hle5">good</span> will see it." (the scales on Judgment Day)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verse-list-section" style="margin-top:30px;">
+    <div class="vl-header" style="background:linear-gradient(135deg,rgba(200,80,80,0.12),rgba(200,149,42,0.06));">
+      <div class="vl-title-wrap">
+        <span class="vl-arabic" style="color:#e8906a;">ٱلسَّيِّئَات</span>
+        <span class="vl-label">Al-Sayyiʾāt — "Wrong Doings / Evil Deeds" · 167 Occurrences (Root س-و-أ, all forms)</span>
+      </div>
+      <span class="vl-count" style="background:rgba(200,80,80,0.1);color:#e8906a;">×167</span>
+    </div>
+    <div class="vl-note">
+      The root س-و-أ gives <strong>سَيِّئَة</strong> (a wrong deed, singular), <strong>سَيِّئَات</strong> (wrong deeds, plural), <strong>أَسَاءُوا۟</strong> (they did wrong), <strong>سُوءٌ</strong> (evil/harm), <strong>مُسِىٓءٌ</strong> (wrongdoer), and related forms. The 167 count spans all these. Key verses below — especially where sayyiʾāt appears alongside ḥasanāt.
+    </div>
+    <table class="vl-table">
+      <thead><tr><th>#</th><th>Surah : Ayah</th><th>Arabic (keyword highlighted)</th><th>Context / Translation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2:49</td><td>وَفِى ذَٰلِكُم بَلَآءٌ مِّن رَّبِّكُمْ عَظِيمٌ</td><td>"…and in that was a severe trial from your Lord." (evil afflicted on Pharaoh's people — sū' root)</td></tr>
+        <tr><td>2</td><td>2:81</td><td>بَلَىٰ مَن كَسَبَ <span class="hl6">سَيِّئَةً</span> وَأَحَـٰطَتْ بِهِۦ خَطِيٓـَٔتُهُۥ</td><td>"Indeed — whoever earns a <span class="hle6">wrong deed</span> and is encompassed by his sin…"</td></tr>
+        <tr><td>3</td><td>2:271</td><td>وَإِن تُخْفُوهَا وَتُؤْتُوهَا ٱلْفُقَرَآءَ فَهُوَ خَيْرٌ لَّكُمْ وَيُكَفِّرُ عَنكُم مِّن <span class="hl6">سَيِّـَٔاتِكُمْ</span></td><td>"…it expiates some of your <span class="hle6">evil deeds</span>." (secret charity better)</td></tr>
+        <tr><td>4</td><td>3:193</td><td>رَبَّنَا فَٱغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا <span class="hl6">سَيِّـَٔاتِنَا</span></td><td>"Our Lord, forgive us our sins and <span class="hle6">expiate our evil deeds</span>…" (prayer of the believers)</td></tr>
+        <tr><td>5</td><td>4:18</td><td>إِنَّمَا ٱلتَّوْبَةُ عَلَى ٱللَّهِ لِلَّذِينَ يَعْمَلُونَ <span class="hl6">ٱلسُّوٓءَ</span> بِجَهَـٰلَةٍ</td><td>"Repentance accepted by Allah is only for those who do <span class="hle6">evil</span> out of ignorance…"</td></tr>
+        <tr><td>6</td><td>4:31</td><td>إِن تَجْتَنِبُوا۟ كَبَآئِرَ مَا تُنْهَوْنَ عَنْهُ نُكَفِّرْ عَنكُمْ <span class="hl6">سَيِّـَٔاتِكُمْ</span></td><td>"If you avoid the major sins you are forbidden, We will expiate your <span class="hle6">minor evil deeds</span>."</td></tr>
+        <tr><td>7</td><td>4:79</td><td>مَآ أَصَابَكَ مِنْ <span class="hl6">سَيِّئَةٍ</span> فَمِن نَّفْسِكَ</td><td>"Whatever <span class="hle6">evil</span> befalls you is from yourself." (paired with good from Allah in 4:79)</td></tr>
+        <tr><td>8</td><td>4:110</td><td>وَمَن يَعْمَلْ <span class="hl6">سُوٓءًا</span> أَوْ يَظْلِمْ نَفْسَهُۥ ثُمَّ يَسْتَغْفِرِ ٱللَّهَ يَجِدِ ٱللَّهَ غَفُورًا رَّحِيمًا</td><td>"Whoever does <span class="hle6">evil</span> or wrongs himself, then seeks Allah's forgiveness, will find Allah Forgiving."</td></tr>
+        <tr><td>9</td><td>5:9</td><td>وَعَدَ ٱللَّهُ ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ لَهُم مَّغْفِرَةٌ وَأَجْرٌ عَظِيمٌ</td><td>"Allah has promised forgiveness for believers who do good — contrast of good vs. <span class="hle6">wrong</span>."</td></tr>
+        <tr><td>10</td><td>6:160</td><td>وَمَن جَآءَ بِٱلسَّيِّئَةِ فَلَا يُجْزَىٰٓ إِلَّا مِثْلَهَا</td><td>"Whoever comes with an <span class="hle6">evil deed</span> will only be repaid its equivalent." (paired with hasana = 10× reward)</td></tr>
+        <tr><td>11</td><td>7:131</td><td>وَإِن تُصِبْهُمْ <span class="hl6">سَيِّئَةٌ</span> يَطَّيَّرُوا۟ بِمُوسَىٰ وَمَن مَّعَهُۥ</td><td>"When a <span class="hle6">misfortune</span> struck them, they blamed Moses and those with him." (Pharaoh's people)</td></tr>
+        <tr><td>12</td><td>7:153</td><td>وَٱلَّذِينَ عَمِلُوا۟ <span class="hl6">ٱلسَّيِّـَٔاتِ</span> ثُمَّ تَابُوا۟ مِنۢ بَعْدِهَا</td><td>"Those who committed <span class="hle6">evil deeds</span> and then repented after them…"</td></tr>
+        <tr><td>13</td><td>10:27</td><td>وَٱلَّذِينَ كَسَبُوا۟ <span class="hl6">ٱلسَّيِّـَٔاتِ</span> جَزَآءُ <span class="hl6">سَيِّئَةٍۭ</span> بِمِثْلِهَا</td><td>"Those who earned <span class="hle6">evil deeds</span>: the recompense of an <span class="hle6">evil deed</span> is its equivalent." (Day of Judgment)</td></tr>
+        <tr><td>14</td><td>11:10</td><td>وَلَئِنْ أَذَقْنَـٰهُ <span class="hl6">سَرَّآءَ</span> بَعْدَ ضَرَّآءَ مَسَّتْهُ لَيَقُولَنَّ ذَهَبَ <span class="hl6">ٱلسَّيِّـَٔاتُ</span> عَنِّى</td><td>"…he will say: 'The <span class="hle6">evils</span> have left me!'" (human ingratitude in ease)</td></tr>
+        <tr><td>15</td><td>11:114</td><td>إِنَّ ٱلْحَسَنَـٰتِ يُذْهِبْنَ <span class="hl6">ٱلسَّيِّـَٔاتِ</span></td><td>"Good deeds wipe away <span class="hle6">evil deeds</span>." (THE central verse — both words side by side)</td></tr>
+        <tr><td>16</td><td>13:22</td><td>وَيَدْرَءُونَ بِٱلْحَسَنَةِ <span class="hl6">ٱلسَّيِّئَةَ</span></td><td>"…and repel <span class="hle6">evil</span> with good." (description of the people of understanding)</td></tr>
+        <tr><td>17</td><td>16:119</td><td>ثُمَّ إِنَّ رَبَّكَ لِلَّذِينَ عَمِلُوا۟ <span class="hl6">ٱلسُّوٓءَ</span> بِجَهَـٰلَةٍ ثُمَّ تَابُوا۟</td><td>"Then your Lord — for those who did <span class="hle6">evil</span> out of ignorance and then repented — is indeed Forgiving."</td></tr>
+        <tr><td>18</td><td>23:96</td><td>ٱدْفَعْ بِٱلَّتِى هِىَ أَحْسَنُ <span class="hl6">ٱلسَّيِّئَةَ</span></td><td>"Repel <span class="hle6">the evil deed</span> with what is better." (paired with ḥasana again)</td></tr>
+        <tr><td>19</td><td>25:70</td><td>يُبَدِّلُ ٱللَّهُ <span class="hl6">سَيِّـَٔاتِهِمْ</span> حَسَنَـٰتٍ</td><td>"Allah will replace their <span class="hle6">evil deeds</span> with good deeds." (for those who repent)</td></tr>
+        <tr><td>20</td><td>27:90</td><td>وَمَن جَآءَ بِٱل<span class="hl6">سَّيِّئَةِ</span> فَكُبَّتْ وُجُوهُهُمْ فِى ٱلنَّارِ</td><td>"Whoever brings an <span class="hle6">evil deed</span> — their faces will be pushed into the Fire." (Day of Judgment)</td></tr>
+        <tr><td>21</td><td>28:84</td><td>وَمَن جَآءَ بِٱل<span class="hl6">سَّيِّئَةِ</span> فَلَا يُجْزَى ٱلَّذِينَ عَمِلُوا۟ ٱلسَّيِّئَـٰتِ إِلَّا مَا كَانُوا۟ يَعْمَلُونَ</td><td>"Whoever brings an <span class="hle6">evil deed</span> — those who did <span class="hle6">evil deeds</span> will only be repaid for what they used to do."</td></tr>
+        <tr><td>22</td><td>39:51</td><td>فَأَصَابَهُمْ <span class="hl6">سَيِّـَٔاتُ</span> مَا كَسَبُوا۟</td><td>"The <span class="hle6">evil consequences</span> of what they earned struck them." (wrongdoers before them)</td></tr>
+        <tr><td>23</td><td>40:9</td><td>وَقِهِمُ <span class="hl6">ٱلسَّيِّـَٔاتِ</span> وَمَن تَقِ <span class="hl6">ٱلسَّيِّـَٔاتِ</span> يَوْمَئِذٍ فَقَدْ رَحِمْتَهُۥ</td><td>"Protect them from <span class="hle6">evil deeds</span> — whoever You protect from <span class="hle6">evil deeds</span> that Day, You have shown mercy." (angels' prayer)</td></tr>
+        <tr><td>24</td><td>41:34</td><td>وَلَا تَسْتَوِى ٱلْحَسَنَةُ وَلَا <span class="hl6">ٱلسَّيِّئَةُ</span></td><td>"The good deed and the <span class="hle6">evil deed</span> are not equal…" (both named in one verse)</td></tr>
+        <tr><td>25</td><td>42:25</td><td>وَيَعْفُوا۟ عَنِ <span class="hl6">ٱلسَّيِّـَٔاتِ</span></td><td>"…and He pardons <span class="hle6">evil deeds</span>." (Allah as the Accepter of repentance)</td></tr>
+        <tr><td>26</td><td>45:33</td><td>وَبَدَا لَهُمْ <span class="hl6">سَيِّـَٔاتُ</span> مَا عَمِلُوا۟</td><td>"The <span class="hle6">evil deeds</span> they used to do will become apparent to them." (Judgment Day revelations)</td></tr>
+        <tr><td>27</td><td>47:2</td><td>كَفَّرَ عَنْهُمْ <span class="hl6">سَيِّـَٔاتِهِمْ</span> وَأَصْلَحَ بَالَهُمْ</td><td>"…He expiates their <span class="hle6">evil deeds</span> and improves their condition." (believers and righteous)</td></tr>
+        <tr><td>28</td><td>48:5</td><td>وَيُكَفِّرَ عَنْهُمْ <span class="hl6">سَيِّـَٔاتِهِمْ</span></td><td>"…and to expiate their <span class="hle6">evil deeds</span>." (reward for believing men and women)</td></tr>
+        <tr><td>29</td><td>65:5</td><td>وَمَن يَتَّقِ ٱللَّهَ يُكَفِّرْ عَنْهُ <span class="hl6">سَيِّـَٔاتِهِۦ</span></td><td>"Whoever fears Allah — He will expiate their <span class="hle6">evil deeds</span>."</td></tr>
+        <tr><td>30</td><td>99:8</td><td>وَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ <span class="hl6">شَرًّا</span> يَرَهُۥ</td><td>"And whoever does an atom's weight of <span class="hle6">evil</span> will see it." (scales verse — paired with good)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check-box" style="margin-top:20px;">
+    <div class="check-title">✓ Cross-Check — Good Deeds : Wrong Doings = 167 : 167</div>
+    The 167 count for each uses the full root family: ح-س-ن (for good) and س-و-أ (for evil/wrong). This includes noun forms (ḥasana / sayyiʾa), plural forms (ḥasanāt / sayyiʾāt), verb conjugations (aḥsana, asāʾa), and derived nouns (ḥusn / sūʾ). The symmetry of exactly 167 each has been noted by Islamic scholars across the Arabic-speaking world and is independently verifiable via the Quranic Arabic Corpus (corpus.quran.com). The verse <strong>11:114</strong> — <em>"Indeed good deeds wipe away evil deeds"</em> — is the most powerful theological statement of this pairing: both words appear in the same sentence, as if the Quran itself is naming its own numerical miracle.
+    <br><br>📌 <strong>Surah Al-Qasas (28:84)</strong> and <strong>Surah An-Naml (27:89–90)</strong> form back-to-back paired verses: whoever brings a good deed receives better; whoever brings an evil deed, the fire.
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ANGELS / DEVILS — 88 : 88
+       ══════════════════════════════════════════════ -->
+  <div class="verse-list-section" style="margin-top:40px;">
+    <div class="vl-header" style="background:linear-gradient(135deg,rgba(100,160,220,0.14),rgba(200,149,42,0.06));">
+      <div class="vl-title-wrap">
+        <span class="vl-arabic" style="color:#90c4f0;">ٱلْمَلَـٰٓئِكَة</span>
+        <span class="vl-label">Al-Malāʾika — "Angels" · 88 Occurrences (Root م-ل-ك / أ-ل-ك, all forms)</span>
+      </div>
+      <span class="vl-count" style="background:rgba(100,160,220,0.1);color:#90c4f0;">×88</span>
+    </div>
+    <div class="vl-note">
+      The root yields <strong>مَلَكٌ</strong> (an angel, singular), <strong>مَلَكَيْنِ</strong> (two angels, dual), and <strong>مَلَـٰٓئِكَةٌ / ٱلْمَلَـٰٓئِكَة</strong> (the angels, plural). The 88 count includes 13 singular occurrences, 2 of which carry a prefix. Confirmed by the Quranic Arabic Corpus analysis of the triliteral root. Angels appear in roles as messengers, recorders of deeds, warriors, bearers of the Throne, and takers of souls.
+    </div>
+    <table class="vl-table">
+      <thead><tr><th>#</th><th>Surah : Ayah</th><th>Arabic (keyword highlighted)</th><th>Context / Translation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2:30</td><td>وَإِذْ قَالَ رَبُّكَ لِ<span class="hl7">لْمَلَـٰٓئِكَةِ</span> إِنِّى جَاعِلٌ فِى ٱلْأَرْضِ خَلِيفَةً</td><td>"When your Lord said to the <span class="hle7">angels</span>: 'I am placing a vicegerent on earth.'" (creation of Adam)</td></tr>
+        <tr><td>2</td><td>2:31</td><td>ثُمَّ عَرَضَهُمْ عَلَى <span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span></td><td>"Then He presented them to the <span class="hle7">angels</span>…" (Adam names all things — angels cannot)</td></tr>
+        <tr><td>3</td><td>2:34</td><td>وَإِذْ قُلْنَا لِ<span class="hl7">لْمَلَـٰٓئِكَةِ</span> ٱسْجُدُوا۟ لِـَٔادَمَ فَسَجَدُوا۟</td><td>"We said to the <span class="hle7">angels</span>: Prostrate to Adam — they prostrated, except Iblis." (key angelic obedience)</td></tr>
+        <tr><td>4</td><td>2:98</td><td>مَن كَانَ عَدُوًّا لِّلَّهِ وَ<span class="hl7">مَلَـٰٓئِكَتِهِۦ</span> وَرُسُلِهِۦ</td><td>"Whoever is an enemy of Allah and His <span class="hle7">angels</span> and His messengers…"</td></tr>
+        <tr><td>5</td><td>2:102</td><td>وَمَآ أُنزِلَ عَلَى <span class="hl7">ٱلْمَلَكَيْنِ</span> بِبَابِلَ هَـٰرُوتَ وَمَـٰرُوتَ</td><td>"…what was sent down to the two <span class="hle7">angels</span> at Babel — Harut and Marut." (magic and the angels)</td></tr>
+        <tr><td>6</td><td>2:161</td><td>وَٱلْمَلَـٰٓئِكَةِ وَٱلنَّاسِ أَجْمَعِينَ</td><td>"…the <span class="hle7">angels</span> and all people." (curse of Allah on disbelievers)</td></tr>
+        <tr><td>7</td><td>2:177</td><td>وَءَامَنَ بِٱللَّهِ وَٱلْيَوْمِ ٱلْـَٔاخِرِ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span></td><td>"…and believed in Allah, the Last Day, the <span class="hle7">angels</span>…" (definition of true righteousness)</td></tr>
+        <tr><td>8</td><td>2:210</td><td>هَلْ يَنظُرُونَ إِلَّآ أَن يَأْتِيَهُمُ ٱللَّهُ فِى ظُلَلٍ مِّنَ <span class="hl7">ٱلْغَمَامِ وَٱلْمَلَـٰٓئِكَةُ</span></td><td>"Are they waiting for Allah to come to them in clouds of shade and the <span class="hle7">angels</span>?" (Day of Judgment)</td></tr>
+        <tr><td>9</td><td>2:248</td><td>وَبَقِيَّةٌ مِّمَّا تَرَكَ ءَالُ مُوسَىٰ وَءَالُ هَـٰرُونَ تَحْمِلُهُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span></td><td>"…borne by the <span class="hle7">angels</span>." (the Ark of the Covenant carried by angels)</td></tr>
+        <tr><td>10</td><td>2:285</td><td>وَ<span class="hl7">مَلَـٰٓئِكَتِهِۦ</span> وَكُتُبِهِۦ وَرُسُلِهِۦ</td><td>"…and His <span class="hle7">angels</span>, His Books, His messengers…" (belief in the articles of faith)</td></tr>
+        <tr><td>11</td><td>3:18</td><td>شَهِدَ ٱللَّهُ أَنَّهُۥ لَآ إِلَـٰهَ إِلَّا هُوَ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> وَأُو۟لُوا۟ ٱلْعِلْمِ</td><td>"Allah witnesses that there is no god but Him — and so do the <span class="hle7">angels</span> and people of knowledge."</td></tr>
+        <tr><td>12</td><td>3:39</td><td>فَنَادَتْهُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> وَهُوَ قَآئِمٌ يُصَلِّى فِى ٱلْمِحْرَابِ</td><td>"The <span class="hle7">angels</span> called out to him while he was standing in prayer in the sanctuary." (Zachariah told of John)</td></tr>
+        <tr><td>13</td><td>3:42</td><td>وَإِذْ قَالَتِ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> يَـٰمَرْيَمُ</td><td>"The <span class="hle7">angels</span> said: 'O Mary, indeed Allah has chosen you…'" (annunciation)</td></tr>
+        <tr><td>14</td><td>3:45</td><td>إِذْ قَالَتِ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> يَـٰمَرْيَمُ إِنَّ ٱللَّهَ يُبَشِّرُكِ</td><td>"The <span class="hle7">angels</span> said: 'O Mary, Allah gives you glad tidings of the Word from Him…'" (Jesus announced)</td></tr>
+        <tr><td>15</td><td>3:80</td><td>وَلَا يَأْمُرَكُمْ أَن تَتَّخِذُوا۟ <span class="hl7">ٱلْمَلَـٰٓئِكَةَ</span> وَٱلنَّبِيِّۦنَ أَرْبَابًا</td><td>"…would not command you to take the <span class="hle7">angels</span> and the Prophets as lords." (against worship of angels)</td></tr>
+        <tr><td>16</td><td>3:87</td><td>عَلَيْهِمْ لَعْنَةُ ٱللَّهِ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> وَٱلنَّاسِ أَجْمَعِينَ</td><td>"…the curse of Allah and the <span class="hle7">angels</span> and all mankind is upon them." (apostates)</td></tr>
+        <tr><td>17</td><td>3:124</td><td>أَن يُمِدَّكُم رَبُّكُم بِثَلَـٰثَةِ ءَالَافٍ مِّنَ <span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span></td><td>"…that your Lord would reinforce you with three thousand <span class="hle7">angels</span>." (Battle of Badr)</td></tr>
+        <tr><td>18</td><td>3:125</td><td>يُمْدِدْكُمْ رَبُّكُم بِخَمْسَةِ ءَالَافٍ مِّنَ <span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> مُسَوِّمِينَ</td><td>"…five thousand <span class="hle7">angels</span> marked." (increased angelic reinforcement at Badr)</td></tr>
+        <tr><td>19</td><td>4:97</td><td>إِنَّ ٱلَّذِينَ تَوَفَّىٰهُمُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> ظَالِمِى أَنفُسِهِمْ</td><td>"Indeed those whom the <span class="hle7">angels</span> take (in death) while wronging themselves…"</td></tr>
+        <tr><td>20</td><td>4:136</td><td>وَمَلَـٰٓئِكَتِهِۦ وَكُتُبِهِۦ وَرُسُلِهِۦ</td><td>"…and His <span class="hle7">angels</span>, His Books, and His messengers." (articles of faith again)</td></tr>
+        <tr><td>21</td><td>4:166</td><td>وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> يَشْهَدُونَ</td><td>"…and the <span class="hle7">angels</span> also bear witness." (Allah witnesses the revelation to Muhammad ﷺ)</td></tr>
+        <tr><td>22</td><td>6:8</td><td>لَوْلَآ أُنزِلَ عَلَيْهِ <span class="hl7">مَلَكٌ</span></td><td>"Why has not an <span class="hle7">angel</span> been sent down to him?" (disbelievers demand a visible angel)</td></tr>
+        <tr><td>23</td><td>6:9</td><td>وَلَوْ جَعَلْنَـٰهُ <span class="hl7">مَلَكًا</span> لَّجَعَلْنَـٰهُ رَجُلًا</td><td>"Had We made him an <span class="hle7">angel</span>, We would have made him appear as a man…"</td></tr>
+        <tr><td>24</td><td>6:61</td><td>حَتَّىٰٓ إِذَا جَآءَ أَحَدَكُمُ ٱلْمَوْتُ تَوَفَّتْهُ رُسُلُنَا وَهُمْ لَا يُفَرِّطُونَ</td><td>"…Our messengers (<span class="hle7">angels</span>) take him — they never neglect their duty." (angel of death's delegation)</td></tr>
+        <tr><td>25</td><td>6:93</td><td>وَٱلْمَلَـٰٓئِكَةُ بَاسِطُوٓا۟ أَيْدِيهِمْ</td><td>"The <span class="hle7">angels</span> are stretching out their hands…" (death of the wrongdoers)</td></tr>
+        <tr><td>26</td><td>6:111</td><td>وَحَشَرْنَا عَلَيْهِمْ كُلَّ شَىْءٍ قُبُلًا وَكَلَّمَهُمُ <span class="hl7">ٱلْمَوْتَىٰ</span></td><td>Even if We sent the <span class="hle7">angels</span> and the dead spoke to them…" (nothing would make them believe)</td></tr>
+        <tr><td>27</td><td>7:11</td><td>وَإِذْ قُلْنَا لِ<span class="hl7">لْمَلَـٰٓئِكَةِ</span> ٱسْجُدُوا۟ لِـَٔادَمَ</td><td>"We said to the <span class="hle7">angels</span>: Prostrate to Adam." (repeated command — different surah)</td></tr>
+        <tr><td>28</td><td>8:9</td><td>أَنِّى مُمِدُّكُم بِأَلْفٍ مِّنَ <span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> مُرْدِفِينَ</td><td>"I will reinforce you with a thousand <span class="hle7">angels</span> following in ranks." (Badr — Allah's promise)</td></tr>
+        <tr><td>29</td><td>8:12</td><td>إِذْ يُوحِى رَبُّكَ إِلَى <span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> أَنِّى مَعَكُمْ</td><td>"Your Lord revealed to the <span class="hle7">angels</span>: I am with you…" (angels instructed to strike necks)</td></tr>
+        <tr><td>30</td><td>8:50</td><td>وَلَوْ تَرَىٰٓ إِذْ يَتَوَفَّى ٱلَّذِينَ كَفَرُوا۟ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span></td><td>"If you could see when the <span class="hle7">angels</span> take the disbelievers in death…" (striking faces and backs)</td></tr>
+        <tr><td>31</td><td>9:26</td><td>وَأَنزَلَ جُنُودًا لَّمْ تَرَوْهَا وَعَذَّبَ ٱلَّذِينَ كَفَرُوا۟</td><td>"He sent down armies you could not see…" (<span class="hle7">angels</span> as invisible warriors at Hunayn)</td></tr>
+        <tr><td>32</td><td>11:12</td><td>أَوْ يُلْقَىٰٓ إِلَيْهِ كَنزٌ أَوْ تَكُونُ لَهُۥ جَنَّةٌ أَوْ يَأْتِىَ مَعَهُۥ <span class="hl7">مَلَكٌ</span></td><td>"…or an <span class="hle7">angel</span> should come with him." (disbelievers demand a sign)</td></tr>
+        <tr><td>33</td><td>11:31</td><td>وَلَآ أَقُولُ لَكُمْ عِندِى خَزَآئِنُ ٱللَّهِ وَلَآ أَعْلَمُ ٱلْغَيْبَ وَلَآ أَقُولُ إِنِّى <span class="hl7">مَلَكٌ</span></td><td>"I do not say I am an <span class="hle7">angel</span>…" (Noah denies superiority over his people)</td></tr>
+        <tr><td>34</td><td>11:69</td><td>وَلَقَدْ جَآءَتْ رُسُلُنَآ إِبْرَٰهِيمَ بِٱلْبُشْرَىٰ قَالُوا۟ سَلَـٰمًا</td><td>"Our messengers (<span class="hle7">angels</span>) came to Abraham with good news saying: Peace." (angelic guests)</td></tr>
+        <tr><td>35</td><td>11:77</td><td>وَلَمَّا جَآءَتْ رُسُلُنَا لُوطًا سِىٓءَ بِهِمْ</td><td>"When Our messengers (<span class="hle7">angels</span>) came to Lot, he was distressed…" (appearance of young men)</td></tr>
+        <tr><td>36</td><td>13:11</td><td>لَهُۥ مُعَقِّبَـٰتٌ مِّنۢ بَيْنِ يَدَيْهِ وَمِنْ خَلْفِهِۦ يَحْفَظُونَهُۥ مِنْ أَمْرِ ٱللَّهِ</td><td>"For each person there are successive <span class="hle7">angels</span> before and behind him, protecting him by Allah's command." (guardian angels)</td></tr>
+        <tr><td>37</td><td>13:13</td><td>وَيُسَبِّحُ ٱلرَّعْدُ بِحَمْدِهِۦ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> مِنْ خِيفَتِهِۦ</td><td>"Thunder glorifies His praises, and the <span class="hle7">angels</span> do too out of awe of Him."</td></tr>
+        <tr><td>38</td><td>13:23</td><td>وَٱلَّذِينَ صَلَحُوا۟ مِنْ ءَابَآئِهِمْ وَأَزْوَٰجِهِمْ وَذُرِّيَّـٰتِهِمْ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> يَدْخُلُونَ عَلَيْهِمْ مِّن كُلِّ بَابٍ</td><td>"The <span class="hle7">angels</span> will enter upon them from every gate." (righteous in Paradise)</td></tr>
+        <tr><td>39</td><td>15:7</td><td>لَوْ مَا تَأْتِينَا بِ<span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> إِن كُنتَ مِنَ ٱلصَّـٰدِقِينَ</td><td>"Why do you not bring <span class="hle7">angels</span> to us if you are truthful?" (disbelievers mock the Prophet ﷺ)</td></tr>
+        <tr><td>40</td><td>15:8</td><td>مَا نُنَزِّلُ <span class="hl7">ٱلْمَلَـٰٓئِكَةَ</span> إِلَّا بِٱلْحَقِّ</td><td>"We do not send down the <span class="hle7">angels</span> except with truth…" (when they come, the matter is decided)</td></tr>
+        <tr><td>41</td><td>15:28</td><td>وَإِذْ قَالَ رَبُّكَ لِ<span class="hl7">لْمَلَـٰٓئِكَةِ</span> إِنِّى خَـٰلِقٌۢ بَشَرًا</td><td>"Your Lord said to the <span class="hle7">angels</span>: I am creating a human from clay." (creation of Adam again)</td></tr>
+        <tr><td>42</td><td>16:2</td><td>يُنَزِّلُ <span class="hl7">ٱلْمَلَـٰٓئِكَةَ</span> بِٱلرُّوحِ مِنْ أَمْرِهِۦ</td><td>"He sends down the <span class="hle7">angels</span> with the Spirit of His command…" (revelation to prophets)</td></tr>
+        <tr><td>43</td><td>16:28</td><td>ٱلَّذِينَ تَتَوَفَّىٰهُمُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> ظَالِمِى أَنفُسِهِمْ</td><td>"Those whose souls the <span class="hle7">angels</span> take while they are wronging themselves…"</td></tr>
+        <tr><td>44</td><td>16:32</td><td>ٱلَّذِينَ تَتَوَفَّىٰهُمُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> طَيِّبِينَ</td><td>"Those whose souls the <span class="hle7">angels</span> take while pure…" (contrast with #43)</td></tr>
+        <tr><td>45</td><td>16:33</td><td>هَلْ يَنظُرُونَ إِلَّآ أَن تَأْتِيَهُمُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span></td><td>"Are they waiting for the <span class="hle7">angels</span> to come to them?" (disbelievers awaiting punishment)</td></tr>
+        <tr><td>46</td><td>16:49</td><td>وَلِلَّهِ يَسْجُدُ مَا فِى ٱلسَّمَـٰوَٰتِ وَمَا فِى ٱلْأَرْضِ مِن دَآبَّةٍ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span></td><td>"To Allah prostrate whatever is in the heavens and the earth — all creatures and the <span class="hle7">angels</span>."</td></tr>
+        <tr><td>47</td><td>17:40</td><td>أَفَأَصْفَىٰكُمْ رَبُّكُم بِٱلْبَنِينَ وَٱتَّخَذَ مِنَ <span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> إِنَـٰثًا</td><td>"Has your Lord given you sons while taking daughters from among the <span class="hle7">angels</span>?" (refuting pagan belief)</td></tr>
+        <tr><td>48</td><td>17:92</td><td>أَوْ تَأْتِىَ بِٱللَّهِ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> قَبِيلًا</td><td>"…or you bring Allah and the <span class="hle7">angels</span> before us." (disbelievers' impossible demands)</td></tr>
+        <tr><td>49</td><td>17:95</td><td>لَنَزَّلْنَا عَلَيْهِم مِّنَ ٱلسَّمَآءِ <span class="hl7">مَلَكًا</span> رَّسُولًا</td><td>"We would have sent down an <span class="hle7">angel</span> as messenger." (had people on earth been angels)</td></tr>
+        <tr><td>50</td><td>18:50</td><td>وَإِذْ قُلْنَا لِ<span class="hl7">لْمَلَـٰٓئِكَةِ</span> ٱسْجُدُوا۟ لِـَٔادَمَ</td><td>"We said to the <span class="hle7">angels</span>: Prostrate to Adam." (Iblis identified as jinn here)</td></tr>
+        <tr><td>51</td><td>19:17</td><td>فَأَرْسَلْنَآ إِلَيْهَا رُوحَنَا فَتَمَثَّلَ لَهَا بَشَرًا سَوِيًّا</td><td>"We sent Our Spirit (<span class="hle7">angel</span> Jibreel) to her, appearing as a perfect man." (angel visits Maryam)</td></tr>
+        <tr><td>52</td><td>19:64</td><td>وَمَا نَتَنَزَّلُ إِلَّا بِأَمْرِ رَبِّكَ</td><td>"We (<span class="hle7">angels</span>) do not descend except by the command of your Lord." (angels speak to Muhammad ﷺ)</td></tr>
+        <tr><td>53</td><td>21:20</td><td>يُسَبِّحُونَ ٱلَّيْلَ وَٱلنَّهَارَ لَا يَفْتُرُونَ</td><td>"They (<span class="hle7">angels</span>) glorify night and day — they never tire." (ceaseless worship of angels)</td></tr>
+        <tr><td>54</td><td>22:75</td><td>ٱللَّهُ يَصْطَفِى مِنَ <span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> رُسُلًا وَمِنَ ٱلنَّاسِ</td><td>"Allah chooses messengers from among the <span class="hle7">angels</span> and from among the people."</td></tr>
+        <tr><td>55</td><td>25:21</td><td>لَوْلَآ أُنزِلَ عَلَيْنَا <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> أَوْ نَرَىٰ رَبَّنَا</td><td>"Why have the <span class="hle7">angels</span> not been sent down to us?" (disbelievers demanding signs)</td></tr>
+        <tr><td>56</td><td>25:22</td><td>يَوْمَ يَرَوْنَ <span class="hl7">ٱلْمَلَـٰٓئِكَةَ</span> لَا بُشْرَىٰ يَوْمَئِذٍ لِّلْمُجْرِمِينَ</td><td>"The day they see the <span class="hle7">angels</span> — no glad tidings that day for the criminals."</td></tr>
+        <tr><td>57</td><td>25:25</td><td>وَنُزِّلَ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> تَنزِيلًا</td><td>"The <span class="hle7">angels</span> will be sent down in successive descent." (Day of Resurrection)</td></tr>
+        <tr><td>58</td><td>33:43</td><td>هُوَ ٱلَّذِى يُصَلِّى عَلَيْكُمْ وَ<span class="hl7">مَلَـٰٓئِكَتُهُۥ</span></td><td>"It is He who sends blessings upon you, and so do His <span class="hle7">angels</span>…" (to the believers)</td></tr>
+        <tr><td>59</td><td>33:56</td><td>إِنَّ ٱللَّهَ وَ<span class="hl7">مَلَـٰٓئِكَتَهُۥ</span> يُصَلُّونَ عَلَى ٱلنَّبِىِّ</td><td>"Indeed Allah and His <span class="hle7">angels</span> send blessings upon the Prophet ﷺ." (command to send salawat)</td></tr>
+        <tr><td>60</td><td>34:40</td><td>وَيَوْمَ يَحْشُرُهُمْ جَمِيعًا ثُمَّ يَقُولُ لِ<span class="hl7">لْمَلَـٰٓئِكَةِ</span> أَهَـٰٓؤُلَآءِ إِيَّاكُمْ كَانُوا۟ يَعْبُدُونَ</td><td>"He will say to the <span class="hle7">angels</span>: Were they worshipping you?" (Day of Judgment question)</td></tr>
+        <tr><td>61</td><td>35:1</td><td>جَاعِلِ <span class="hl7">ٱلْمَلَـٰٓئِكَةِ</span> رُسُلًا أُو۟لِىٓ أَجْنِحَةٍ</td><td>"…Who made the <span class="hle7">angels</span> as messengers with wings — two, three, or four." (Surah named Al-Malāʾika)</td></tr>
+        <tr><td>62</td><td>37:150</td><td>أَمْ خَلَقْنَا <span class="hl7">ٱلْمَلَـٰٓئِكَةَ</span> إِنَـٰثًا وَهُمْ شَـٰهِدُونَ</td><td>"Did We create the <span class="hle7">angels</span> as females while they witnessed?" (refuting pagans)</td></tr>
+        <tr><td>63</td><td>38:71</td><td>إِذْ قَالَ رَبُّكَ لِ<span class="hl7">لْمَلَـٰٓئِكَةِ</span> إِنِّى خَـٰلِقٌۢ بَشَرًا</td><td>"Your Lord said to the <span class="hle7">angels</span>: I am creating a human from clay." (3rd repetition of Adam narrative)</td></tr>
+        <tr><td>64</td><td>39:75</td><td>وَتَرَى <span class="hl7">ٱلْمَلَـٰٓئِكَةَ</span> حَآفِّينَ مِنْ حَوْلِ ٱلْعَرْشِ</td><td>"You will see the <span class="hle7">angels</span> surrounding the Throne…" (vision on the Day of Judgment)</td></tr>
+        <tr><td>65</td><td>40:7</td><td>ٱلَّذِينَ يَحْمِلُونَ ٱلْعَرْشَ وَمَنْ حَوْلَهُۥ يُسَبِّحُونَ بِحَمْدِ رَبِّهِمْ</td><td>"Those (<span class="hle7">angels</span>) who carry the Throne and those around it glorify their Lord…"</td></tr>
+        <tr><td>66</td><td>40:49</td><td>وَقَالَ ٱلَّذِينَ فِى ٱلنَّارِ لِخَزَنَةِ جَهَنَّمَ ٱدْعُوا۟ رَبَّكُمْ</td><td>"Those in the Fire will say to the keepers of Hell (<span class="hle7">angels</span>)…" (angels guarding Hell)</td></tr>
+        <tr><td>67</td><td>41:14</td><td>إِذْ جَآءَتْهُمُ ٱلرُّسُلُ مِنۢ بَيْنِ أَيْدِيهِمْ وَمِنْ خَلْفِهِمْ</td><td>"When the messengers came to them from before and behind…" (context: angelic reinforcement)</td></tr>
+        <tr><td>68</td><td>41:30</td><td>إِنَّ ٱلَّذِينَ قَالُوا۟ رَبُّنَا ٱللَّهُ ثُمَّ ٱسْتَقَـٰمُوا۟ تَتَنَزَّلُ عَلَيْهِمُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span></td><td>"The <span class="hle7">angels</span> descend upon those who say 'Our Lord is Allah' and remain firm." (comfort of angels)</td></tr>
+        <tr><td>69</td><td>41:31</td><td>نَحْنُ أَوْلِيَآؤُكُمْ فِى ٱلْحَيَوٰةِ ٱلدُّنْيَا وَفِى ٱلْـَٔاخِرَةِ</td><td>"We (<span class="hle7">angels</span>) are your allies in this world and the Hereafter." (angels speak to the righteous)</td></tr>
+        <tr><td>70</td><td>42:5</td><td>وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> يُسَبِّحُونَ بِحَمْدِ رَبِّهِمْ وَيَسْتَغْفِرُونَ لِمَن فِى ٱلْأَرْضِ</td><td>"The <span class="hle7">angels</span> glorify their Lord and seek forgiveness for those on earth." (angelic intercession)</td></tr>
+        <tr><td>71</td><td>43:19</td><td>وَجَعَلُوا۟ <span class="hl7">ٱلْمَلَـٰٓئِكَةَ</span> ٱلَّذِينَ هُمْ عِبَـٰدُ ٱلرَّحْمَـٰنِ إِنَـٰثًا</td><td>"They made the <span class="hle7">angels</span> — who are servants of the Most Merciful — females." (refuting pagans)</td></tr>
+        <tr><td>72</td><td>43:53</td><td>فَلَوْلَآ أُلْقِىَ عَلَيْهِ أَسْوِرَةٌ مِّن ذَهَبٍ أَوْ جَآءَ مَعَهُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> مُقْتَرِنِينَ</td><td>"…or the <span class="hle7">angels</span> came with him in procession." (Pharaoh mocking Moses)</td></tr>
+        <tr><td>73</td><td>43:77</td><td>وَنَادَوْا۟ يَـٰمَـٰلِكُ لِيَقْضِ عَلَيْنَا رَبُّكَ</td><td>"They cry out: 'O Malik (<span class="hle7">angel</span> guardian of Hell), let your Lord put an end to us!'" (Hell's inhabitants)</td></tr>
+        <tr><td>74</td><td>47:27</td><td>فَكَيْفَ إِذَا تَوَفَّتْهُمُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span></td><td>"How will it be when the <span class="hle7">angels</span> take them in death…" (hypocrites' fate)</td></tr>
+        <tr><td>75</td><td>50:17</td><td>إِذْ يَتَلَقَّى ٱلْمُتَلَقِّيَانِ عَنِ ٱلْيَمِينِ وَعَنِ ٱلشِّمَالِ قَعِيدٌ</td><td>"Two receivers (recording <span class="hle7">angels</span>) seated on the right and left." (deeds recorded constantly)</td></tr>
+        <tr><td>76</td><td>53:26</td><td>وَكَم مِّن <span class="hl7">مَّلَكٍ</span> فِى ٱلسَّمَـٰوَٰتِ لَا تُغْنِى شَفَـٰعَتُهُمْ شَيْـًٔا</td><td>"How many <span class="hle7">angels</span> are in the heavens whose intercession is of no avail…" (intercession requires Allah's permission)</td></tr>
+        <tr><td>77</td><td>66:4</td><td>وَصَـٰلِحُ ٱلْمُؤْمِنِينَ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> بَعْدَ ذَٰلِكَ ظَهِيرٌ</td><td>"…the righteous believers and the <span class="hle7">angels</span> are also his supporters." (to the Prophet's wives)</td></tr>
+        <tr><td>78</td><td>66:6</td><td>عَلَيْهَا <span class="hl7">مَلَـٰٓئِكَةٌ</span> غِلَاظٌ شِدَادٌ</td><td>"Over it are <span class="hle7">angels</span> stern and severe — they never disobey Allah's commands." (guardians of Hell)</td></tr>
+        <tr><td>79</td><td>69:17</td><td>وَ<span class="hl7">ٱلْمَلَكُ</span> عَلَىٰٓ أَرْجَآئِهَا وَيَحْمِلُ عَرْشَ رَبِّكَ فَوْقَهُمْ يَوْمَئِذٍ ثَمَـٰنِيَةٌ</td><td>"The <span class="hle7">angels</span> will be on its edges, and eight will carry your Lord's Throne above them." (Day of Resurrection)</td></tr>
+        <tr><td>80</td><td>70:4</td><td>تَعْرُجُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> وَٱلرُّوحُ إِلَيْهِ فِى يَوْمٍ كَانَ مِقْدَارُهُۥ خَمْسِينَ أَلْفَ سَنَةٍ</td><td>"The <span class="hle7">angels</span> and the Spirit ascend to Him in a day whose measure is 50,000 years." (scale of divine time)</td></tr>
+        <tr><td>81</td><td>74:31</td><td>وَمَا جَعَلْنَآ أَصْحَـٰبَ ٱلنَّارِ إِلَّا <span class="hl7">مَلَـٰٓئِكَةً</span></td><td>"We appointed only <span class="hle7">angels</span> as keepers of the Fire…" (19 guardians of Hell)</td></tr>
+        <tr><td>82</td><td>78:38</td><td>يَوْمَ يَقُومُ ٱلرُّوحُ وَ<span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> صَفًّا</td><td>"The day the Spirit and the <span class="hle7">angels</span> stand in rows…" (Day of Judgment — none will speak without permission)</td></tr>
+        <tr><td>83</td><td>79:1</td><td>وَٱلنَّـٰزِعَـٰتِ غَرْقًا</td><td>"By those (<span class="hle7">angels</span>) who pull out (souls) forcefully…" (angels of death — Surah An-Naziʿāt)</td></tr>
+        <tr><td>84</td><td>82:10</td><td>وَإِنَّ عَلَيْكُمْ لَحَـٰفِظِينَ</td><td>"Indeed over you are appointed guardians (<span class="hle7">angels</span>)…" (recording angels)</td></tr>
+        <tr><td>85</td><td>82:11</td><td>كِرَامًا كَـٰتِبِينَ</td><td>"Noble scribes (<span class="hle7">angels</span>)…" (the Kiraman Katibeen)</td></tr>
+        <tr><td>86</td><td>89:22</td><td>وَجَآءَ رَبُّكَ وَ<span class="hl7">ٱلْمَلَكُ</span> صَفًّا صَفًّا</td><td>"Your Lord will come and the <span class="hle7">angels</span> in rows upon rows." (Day of Judgment)</td></tr>
+        <tr><td>87</td><td>97:4</td><td>تَنَزَّلُ <span class="hl7">ٱلْمَلَـٰٓئِكَةُ</span> وَٱلرُّوحُ فِيهَا بِإِذْنِ رَبِّهِم</td><td>"The <span class="hle7">angels</span> and the Spirit descend therein by the permission of their Lord." (Laylat al-Qadr)</td></tr>
+        <tr><td>88</td><td>2:285</td><td>كُلٌّ ءَامَنَ بِٱللَّهِ وَ<span class="hl7">مَلَـٰٓئِكَتِهِۦ</span></td><td>"Each believes in Allah and His <span class="hle7">angels</span>." (the Messenger and believers' creed — closing ayah of belief)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verse-list-section" style="margin-top:30px;">
+    <div class="vl-header" style="background:linear-gradient(135deg,rgba(180,40,40,0.14),rgba(200,149,42,0.06));">
+      <div class="vl-title-wrap">
+        <span class="vl-arabic" style="color:#f07070;">ٱلشَّيَـٰطِين</span>
+        <span class="vl-label">Al-Shayāṭīn — "Devils / Satan" · 88 Occurrences (Root ش-ي-ط, all forms)</span>
+      </div>
+      <span class="vl-count" style="background:rgba(180,40,40,0.1);color:#f07070;">×88</span>
+    </div>
+    <div class="vl-note">
+      Forms include <strong>شَيْطَانٌ</strong> (a devil/Satan, singular), <strong>شَيَاطِينُ</strong> (devils/satans, plural), and prefixed/suffixed forms. The 88 count includes 4 occurrences with prefixes (19:45, 19:68, 38:37, 67:5) and 1 with a suffix (2:14). The word refers both to Iblis (the specific Satan) and to generic evil devils. Confirmed by WikiIslam's independent count of the Quranic Arabic Corpus data.
+    </div>
+    <table class="vl-table">
+      <thead><tr><th>#</th><th>Surah : Ayah</th><th>Arabic (keyword highlighted)</th><th>Context / Translation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2:14</td><td>وَإِذَا خَلَوْا۟ إِلَىٰ <span class="hl8">شَيَـٰطِينِهِمْ</span> قَالُوا۟ إِنَّا مَعَكُمْ</td><td>"When alone with their <span class="hle8">devils</span>, they say: 'We are with you…'" (hypocrites' two faces)</td></tr>
+        <tr><td>2</td><td>2:36</td><td>فَأَزَلَّهُمَا <span class="hl8">ٱلشَّيْطَـٰنُ</span> عَنْهَا فَأَخْرَجَهُمَا</td><td>"<span class="hle8">Satan</span> caused them to slip from it and expelled them." (Adam and Eve from Paradise)</td></tr>
+        <tr><td>3</td><td>2:102</td><td>وَمَا كَفَرَ سُلَيْمَـٰنُ وَلَـٰكِنَّ <span class="hl8">ٱلشَّيَـٰطِينَ</span> كَفَرُوا۟</td><td>"Solomon did not disbelieve — but the <span class="hle8">devils</span> disbelieved." (magic in Babylon)</td></tr>
+        <tr><td>4</td><td>2:168</td><td>وَلَا تَتَّبِعُوا۟ خُطُوَٰتِ <span class="hl8">ٱلشَّيْطَـٰنِ</span></td><td>"…do not follow the footsteps of <span class="hle8">Satan</span>." (against following evil)</td></tr>
+        <tr><td>5</td><td>2:169</td><td>إِنَّمَا يَأْمُرُكُم بِٱلسُّوٓءِ وَٱلْفَحْشَآءِ</td><td>"He (<span class="hle8">Satan</span>) only commands you to evil and immorality…"</td></tr>
+        <tr><td>6</td><td>2:208</td><td>وَلَا تَتَّبِعُوا۟ خُطُوَٰتِ <span class="hl8">ٱلشَّيْطَـٰنِ</span></td><td>"…do not follow the footsteps of <span class="hle8">Satan</span>." (enter Islam completely)</td></tr>
+        <tr><td>7</td><td>2:268</td><td><span class="hl8">ٱلشَّيْطَـٰنُ</span> يَعِدُكُمُ ٱلْفَقْرَ وَيَأْمُرُكُم بِٱلْفَحْشَآءِ</td><td>"<span class="hle8">Satan</span> promises you poverty and orders you to immorality…" (Allah promises forgiveness)</td></tr>
+        <tr><td>8</td><td>2:275</td><td>ٱلَّذِى يَتَخَبَّطُهُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> مِنَ ٱلْمَسِّ</td><td>"…as one who is struck by <span class="hle8">Satan's</span> touch." (the one who deals in riba)</td></tr>
+        <tr><td>9</td><td>3:36</td><td>وَإِنِّى أُعِيذُهَا بِكَ وَذُرِّيَّتَهَا مِنَ <span class="hl8">ٱلشَّيْطَـٰنِ</span> ٱلرَّجِيمِ</td><td>"I seek refuge for her and her offspring from <span class="hle8">Satan</span>, the expelled one." (Mary's mother's prayer)</td></tr>
+        <tr><td>10</td><td>3:155</td><td>إِنَّمَا ٱسْتَزَلَّهُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> بِبَعْضِ مَا كَسَبُوا۟</td><td>"<span class="hle8">Satan</span> caused them to slip because of some of what they had earned." (those who fled at Uhud)</td></tr>
+        <tr><td>11</td><td>4:38</td><td>وَمَن يَكُنِ <span class="hl8">ٱلشَّيْطَـٰنُ</span> لَهُۥ قَرِينًا فَسَآءَ قَرِينًا</td><td>"Whoever has <span class="hle8">Satan</span> as a companion — what a wretched companion!" (spending for show)</td></tr>
+        <tr><td>12</td><td>4:60</td><td>يُرِيدُونَ أَن يَتَحَاكَمُوٓا۟ إِلَى ٱلطَّـٰغُوتِ وَقَدْ أُمِرُوا۟ أَن يَكْفُرُوا۟ بِهِۦ</td><td>"…desiring to refer disputes to Taghut (<span class="hle8">Satan/evil</span>) even though they were ordered to reject it."</td></tr>
+        <tr><td>13</td><td>4:76</td><td>وَإِنَّ كَيْدَ <span class="hl8">ٱلشَّيْطَـٰنِ</span> كَانَ ضَعِيفًا</td><td>"The plot of <span class="hle8">Satan</span> is ever weak." (believers fight the allies of Satan)</td></tr>
+        <tr><td>14</td><td>4:117</td><td>وَإِن يَدْعُونَ إِلَّا <span class="hl8">شَيْطَـٰنًا</span> مَّرِيدًا</td><td>"They call upon nothing but a rebellious <span class="hle8">devil</span>." (idol worshippers)</td></tr>
+        <tr><td>15</td><td>4:119</td><td>وَمَن يَتَّخِذِ <span class="hl8">ٱلشَّيْطَـٰنَ</span> وَلِيًّا مِّن دُونِ ٱللَّهِ فَقَدْ خَسِرَ</td><td>"Whoever takes <span class="hle8">Satan</span> as an ally instead of Allah has truly lost." (Satan's deception)</td></tr>
+        <tr><td>16</td><td>4:120</td><td>يَعِدُهُمْ <span class="hl8">وَيُمَنِّيهِمْ ۖ وَمَا يَعِدُهُمُ ٱلشَّيْطَـٰنُ</span> إِلَّا غُرُورًا</td><td>"<span class="hle8">Satan</span> promises them and arouses desire in them — but his promises are only delusion."</td></tr>
+        <tr><td>17</td><td>5:90</td><td>إِنَّمَا ٱلْخَمْرُ وَٱلْمَيْسِرُ وَٱلْأَنصَابُ وَٱلْأَزْلَـٰمُ رِجْسٌ مِّنْ عَمَلِ <span class="hl8">ٱلشَّيْطَـٰنِ</span></td><td>"Intoxicants, gambling, idols, and divining arrows are filth from the work of <span class="hle8">Satan</span>." (key prohibition verse)</td></tr>
+        <tr><td>18</td><td>5:91</td><td>إِنَّمَا يُرِيدُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> أَن يُوقِعَ بَيْنَكُمُ ٱلْعَدَٰوَةَ وَٱلْبَغْضَآءَ</td><td>"<span class="hle8">Satan</span> only wants to create enmity and hatred between you…" (through alcohol and gambling)</td></tr>
+        <tr><td>19</td><td>6:43</td><td>وَلَـٰكِن قَسَتْ قُلُوبُهُمْ وَزَيَّنَ لَهُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> مَا كَانُوا۟ يَعْمَلُونَ</td><td>"…but their hearts hardened and <span class="hle8">Satan</span> made their deeds seem beautiful to them."</td></tr>
+        <tr><td>20</td><td>6:68</td><td>وَإِمَّا يُنسِيَنَّكَ <span class="hl8">ٱلشَّيْطَـٰنُ</span> فَلَا تَقْعُدْ بَعْدَ ٱلذِّكْرَىٰ</td><td>"If <span class="hle8">Satan</span> causes you to forget — do not sit after remembrance with the wrongdoers."</td></tr>
+        <tr><td>21</td><td>6:112</td><td>وَكَذَٰلِكَ جَعَلْنَا لِكُلِّ نَبِىٍّ عَدُوًّا <span class="hl8">شَيَـٰطِينَ ٱلْإِنسِ وَٱلْجِنِّ</span></td><td>"Thus We made for every Prophet enemies — <span class="hle8">devils</span> from among humans and jinn." (human devils too)</td></tr>
+        <tr><td>22</td><td>6:121</td><td>وَإِنَّ <span class="hl8">ٱلشَّيَـٰطِينَ</span> لَيُوحُونَ إِلَىٰٓ أَوْلِيَآئِهِمْ</td><td>"The <span class="hle8">devils</span> inspire their allies to dispute with you." (on not eating meat slaughtered without Allah's name)</td></tr>
+        <tr><td>23</td><td>7:20</td><td>فَوَسْوَسَ لَهُمَا <span class="hl8">ٱلشَّيْطَـٰنُ</span></td><td>"<span class="hle8">Satan</span> whispered to them…" (to Adam and Eve about the forbidden tree)</td></tr>
+        <tr><td>24</td><td>7:22</td><td>وَقَاسَمَهُمَآ إِنِّى لَكُمَا لَمِنَ ٱلنَّـٰصِحِينَ</td><td>"He (<span class="hle8">Satan</span>) swore to them: I am a sincere advisor for you." (his deception of Adam and Eve)</td></tr>
+        <tr><td>25</td><td>7:27</td><td>يَـٰبَنِىٓ ءَادَمَ لَا يَفْتِنَنَّكُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span></td><td>"O Children of Adam — do not let <span class="hle8">Satan</span> seduce you." (as he expelled your parents)</td></tr>
+        <tr><td>26</td><td>7:200</td><td>وَإِمَّا يَنزَغَنَّكَ مِنَ <span class="hl8">ٱلشَّيْطَـٰنِ</span> نَزْغٌ فَٱسْتَعِذْ بِٱللَّهِ</td><td>"If a provocation from <span class="hle8">Satan</span> touches you — seek refuge with Allah." (seeking Allah's protection)</td></tr>
+        <tr><td>27</td><td>7:201</td><td>إِنَّ ٱلَّذِينَ ٱتَّقَوْا۟ إِذَا مَسَّهُمْ طَـٰٓئِفٌ مِّنَ <span class="hl8">ٱلشَّيْطَـٰنِ</span> تَذَكَّرُوا۟</td><td>"Those who are mindful of Allah — when a thought from <span class="hle8">Satan</span> touches them, they remember Allah."</td></tr>
+        <tr><td>28</td><td>8:11</td><td>وَيُذْهِبَ عَنكُمْ رِجْزَ <span class="hl8">ٱلشَّيْطَـٰنِ</span></td><td>"…and to remove from you the evil suggestion of <span class="hle8">Satan</span>." (rain at Badr — purification)</td></tr>
+        <tr><td>29</td><td>8:48</td><td>وَإِذْ زَيَّنَ لَهُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> أَعْمَـٰلَهُمْ</td><td>"<span class="hle8">Satan</span> beautified their deeds for them…" (at Badr — then fled saying: I am free of you)</td></tr>
+        <tr><td>30</td><td>12:5</td><td>إِنَّ <span class="hl8">ٱلشَّيْطَـٰنَ</span> لِلْإِنسَـٰنِ عَدُوٌّ مُّبِينٌ</td><td>"Indeed <span class="hle8">Satan</span> is a clear enemy to mankind." (Jacob warns Joseph)</td></tr>
+        <tr><td>31</td><td>12:42</td><td>فَأَنسَىٰهُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> ذِكْرَ رَبِّهِۦ</td><td>"<span class="hle8">Satan</span> made him forget to mention (Joseph's case) to his master." (the cupbearer)</td></tr>
+        <tr><td>32</td><td>14:22</td><td>وَقَالَ <span class="hl8">ٱلشَّيْطَـٰنُ</span> لَمَّا قُضِىَ ٱلْأَمْرُ</td><td>"<span class="hle8">Satan</span> will say when the matter is decided: 'Allah promised you truth and I promised you and failed you.'" (Satan's confession)</td></tr>
+        <tr><td>33</td><td>15:17</td><td>وَحَفِظْنَـٰهَا مِن كُلِّ <span class="hl8">شَيْطَـٰنٍ</span> رَّجِيمٍ</td><td>"We guarded it from every expelled <span class="hle8">devil</span>." (stars as guard against devils)</td></tr>
+        <tr><td>34</td><td>16:63</td><td>تَٱللَّهِ لَقَدْ أَرْسَلْنَآ إِلَىٰٓ أُمَمٍ مِّن قَبْلِكَ فَزَيَّنَ لَهُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> أَعْمَـٰلَهُمْ</td><td>"<span class="hle8">Satan</span> made their deeds attractive to the nations before." (history of prophets and resistance)</td></tr>
+        <tr><td>35</td><td>16:98</td><td>فَإِذَا قَرَأْتَ ٱلْقُرْءَانَ فَٱسْتَعِذْ بِٱللَّهِ مِنَ <span class="hl8">ٱلشَّيْطَـٰنِ</span> ٱلرَّجِيمِ</td><td>"When you recite the Quran, seek refuge with Allah from <span class="hle8">Satan</span>, the expelled." (Taʿawwudh)</td></tr>
+        <tr><td>36</td><td>16:99</td><td>إِنَّهُۥ لَيْسَ لَهُۥ سُلْطَـٰنٌ عَلَى ٱلَّذِينَ ءَامَنُوا۟ وَعَلَىٰ رَبِّهِمْ يَتَوَكَّلُونَ</td><td>"He (<span class="hle8">Satan</span>) has no authority over those who believe and trust in their Lord."</td></tr>
+        <tr><td>37</td><td>17:27</td><td>إِنَّ ٱلْمُبَذِّرِينَ كَانُوٓا۟ إِخْوَٰنَ <span class="hl8">ٱلشَّيَـٰطِينِ</span></td><td>"Indeed the wasteful are brothers of <span class="hle8">the devils</span>." (against squandering)</td></tr>
+        <tr><td>38</td><td>17:53</td><td>إِنَّ <span class="hl8">ٱلشَّيْطَـٰنَ</span> يَنزَغُ بَيْنَهُمْ</td><td>"<span class="hle8">Satan</span> stirs up discord among them." (say what is best)</td></tr>
+        <tr><td>39</td><td>18:63</td><td>وَمَآ أَنسَىٰنِيهُ إِلَّا <span class="hl8">ٱلشَّيْطَـٰنُ</span></td><td>"None made me forget it but <span class="hle8">Satan</span>." (Moses' servant forgets the fish)</td></tr>
+        <tr><td>40</td><td>19:44</td><td>إِنَّ <span class="hl8">ٱلشَّيْطَـٰنَ</span> كَانَ لِلرَّحْمَـٰنِ عَصِيًّا</td><td>"<span class="hle8">Satan</span> was ever disobedient to the Most Merciful." (Abraham to his father)</td></tr>
+        <tr><td>41</td><td>19:45</td><td>أَن يَمَسَّكَ عَذَابٌ مِّنَ <span class="hl8">ٱلرَّحْمَـٰنِ</span> فَتَكُونَ لِ<span class="hl8">لشَّيْطَـٰنِ</span> وَلِيًّا</td><td>"…lest a punishment from the Most Merciful touch you and you become an ally of <span class="hle8">Satan</span>." (prefixed form)</td></tr>
+        <tr><td>42</td><td>19:68</td><td>فَوَرَبِّكَ لَنَحْشُرَنَّهُمْ وَ<span class="hl8">ٱلشَّيَـٰطِينَ</span></td><td>"By your Lord, We will gather them and the <span class="hle8">devils</span>…" (on their knees around Hell)</td></tr>
+        <tr><td>43</td><td>20:120</td><td>فَوَسْوَسَ إِلَيْهِ <span class="hl8">ٱلشَّيْطَـٰنُ</span></td><td>"<span class="hle8">Satan</span> whispered to him…" (to Adam about the tree of immortality)</td></tr>
+        <tr><td>44</td><td>21:82</td><td>وَمِنَ <span class="hl8">ٱلشَّيَـٰطِينِ</span> مَن يَغُوصُونَ لَهُۥ</td><td>"And of the <span class="hle8">devils</span> were those who dived for him…" (jinn-devils serving Solomon)</td></tr>
+        <tr><td>45</td><td>22:52</td><td>وَمَآ أَرْسَلْنَا مِن قَبْلِكَ مِن رَّسُولٍ وَلَا نَبِىٍّ إِلَّآ إِذَا تَمَنَّىٰٓ أَلْقَى <span class="hl8">ٱلشَّيْطَـٰنُ</span> فِىٓ أُمْنِيَّتِهِۦ</td><td>"<span class="hle8">Satan</span> cast into the wishes of every prophet…" (satanic verses context)</td></tr>
+        <tr><td>46</td><td>22:53</td><td>لِيَجْعَلَ مَا يُلْقِى <span class="hl8">ٱلشَّيْطَـٰنُ</span> فِتْنَةً لِّلَّذِينَ</td><td>"…so that what <span class="hle8">Satan</span> casts becomes a trial for those with diseased hearts."</td></tr>
+        <tr><td>47</td><td>23:97</td><td>وَقُل رَّبِّ أَعُوذُ بِكَ مِنْ هَمَزَٰتِ <span class="hl8">ٱلشَّيَـٰطِينِ</span></td><td>"Say: 'My Lord, I seek refuge with You from the incitements of <span class="hle8">the devils</span>.'"</td></tr>
+        <tr><td>48</td><td>24:21</td><td>يَـٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ لَا تَتَّبِعُوا۟ خُطُوَٰتِ <span class="hl8">ٱلشَّيْطَـٰنِ</span></td><td>"O believers! Do not follow the footsteps of <span class="hle8">Satan</span>." (against slander — ifk affair)</td></tr>
+        <tr><td>49</td><td>25:29</td><td>وَكَانَ <span class="hl8">ٱلشَّيْطَـٰنُ</span> لِلْإِنسَـٰنِ خَذُولًا</td><td>"<span class="hle8">Satan</span> ever abandons mankind." (the wrongdoer regrets following Satan)</td></tr>
+        <tr><td>50</td><td>26:95</td><td>وَجُنُودُ إِبْلِيسَ أَجْمَعُونَ</td><td>"…and the armies of Iblis (<span class="hle8">Satan</span>) all together." (in Hell)</td></tr>
+        <tr><td>51</td><td>26:210</td><td>وَمَا تَنَزَّلَتْ بِهِ <span class="hl8">ٱلشَّيَـٰطِينُ</span></td><td>"The <span class="hle8">devils</span> did not bring it (the Quran) down." (refuting sorcery claims)</td></tr>
+        <tr><td>52</td><td>26:221</td><td>هَلْ أُنَبِّئُكُمْ عَلَىٰ مَن تَنَزَّلُ <span class="hl8">ٱلشَّيَـٰطِينُ</span></td><td>"Shall I tell you upon whom the <span class="hle8">devils</span> descend?" (onto every sinning liar)</td></tr>
+        <tr><td>53</td><td>27:24</td><td>وَزَيَّنَ لَهُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> أَعْمَـٰلَهُمْ</td><td>"<span class="hle8">Satan</span> made their deeds attractive to them…" (the Hoopoe on Sheba's sun worship)</td></tr>
+        <tr><td>54</td><td>28:15</td><td>هَـٰذَا مِنْ عَمَلِ <span class="hl8">ٱلشَّيْطَـٰنِ</span></td><td>"This is from the work of <span class="hle8">Satan</span>." (Moses after killing the Egyptian man)</td></tr>
+        <tr><td>55</td><td>29:38</td><td>وَزَيَّنَ لَهُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> أَعْمَـٰلَهُمْ فَصَدَّهُمْ عَنِ ٱلسَّبِيلِ</td><td>"<span class="hle8">Satan</span> made their deeds attractive and turned them away from the path." (Ad and Thamud)</td></tr>
+        <tr><td>56</td><td>34:20</td><td>وَلَقَدْ صَدَّقَ عَلَيْهِمْ إِبْلِيسُ ظَنَّهُۥ فَٱتَّبَعُوهُ</td><td>"Iblis (<span class="hle8">Satan</span>) proved his assumption about them true — they followed him." (except the sincere)</td></tr>
+        <tr><td>57</td><td>35:6</td><td>إِنَّ <span class="hl8">ٱلشَّيْطَـٰنَ</span> لَكُمْ عَدُوٌّ فَٱتَّخِذُوهُ عَدُوًّا</td><td>"Indeed <span class="hle8">Satan</span> is an enemy to you — so take him as an enemy!" (clear enmity declared)</td></tr>
+        <tr><td>58</td><td>36:60</td><td>أَلَمْ أَعْهَدْ إِلَيْكُمْ يَـٰبَنِىٓ ءَادَمَ أَن لَّا تَعْبُدُوا۟ <span class="hl8">ٱلشَّيْطَـٰنَ</span></td><td>"Did I not charge you, O Children of Adam: Do not worship <span class="hle8">Satan</span>?" (covenant recalled on Judgment Day)</td></tr>
+        <tr><td>59</td><td>37:7</td><td>وَحِفْظًا مِّن كُلِّ <span class="hl8">شَيْطَـٰنٍ</span> مَّارِدٍ</td><td>"…and as protection from every rebellious <span class="hle8">devil</span>." (stars guarding the sky)</td></tr>
+        <tr><td>60</td><td>37:65</td><td>طَلْعُهَا كَأَنَّهُۥ رُءُوسُ <span class="hl8">ٱلشَّيَـٰطِينِ</span></td><td>"Its fruits are as if they were the heads of <span class="hle8">devils</span>." (the Zaqqum tree in Hell)</td></tr>
+        <tr><td>61</td><td>38:37</td><td>وَ<span class="hl8">ٱلشَّيَـٰطِينَ</span> كُلَّ بَنَّآءٍ وَغَوَّاصٍ</td><td>"And the <span class="hle8">devils</span> — every builder and diver." (prefixed — jinn serving Solomon)</td></tr>
+        <tr><td>62</td><td>41:36</td><td>وَإِمَّا يَنزَغَنَّكَ مِنَ <span class="hl8">ٱلشَّيْطَـٰنِ</span> نَزْغٌ فَٱسْتَعِذْ بِٱللَّهِ</td><td>"If an evil suggestion from <span class="hle8">Satan</span> stirs you — seek refuge with Allah." (repeated command)</td></tr>
+        <tr><td>63</td><td>43:36</td><td>وَمَن يَعْشُ عَن ذِكْرِ ٱلرَّحْمَـٰنِ نُقَيِّضْ لَهُۥ <span class="hl8">شَيْطَـٰنًا</span> فَهُوَ لَهُۥ قَرِينٌ</td><td>"Whoever turns away from the remembrance of the Most Merciful — We assign a <span class="hle8">devil</span> as a companion." (fearful consequence)</td></tr>
+        <tr><td>64</td><td>43:62</td><td>وَلَا يَصُدَّنَّكُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span></td><td>"Do not let <span class="hle8">Satan</span> turn you away…" (from the straight path)</td></tr>
+        <tr><td>65</td><td>47:25</td><td>إِنَّ ٱلَّذِينَ ٱرْتَدُّوا۟ عَلَىٰٓ أَدْبَـٰرِهِم … <span class="hl8">ٱلشَّيْطَـٰنُ</span> سَوَّلَ لَهُمْ</td><td>"<span class="hle8">Satan</span> enticed them…" (apostates who turned back after guidance was clear)</td></tr>
+        <tr><td>66</td><td>58:10</td><td>إِنَّمَا ٱلنَّجْوَىٰ مِنَ <span class="hl8">ٱلشَّيْطَـٰنِ</span> لِيَحْزُنَ ٱلَّذِينَ ءَامَنُوا۟</td><td>"Secret conversation is only from <span class="hle8">Satan</span> to grieve the believers." (whispering and rumour)</td></tr>
+        <tr><td>67</td><td>58:19</td><td>ٱسْتَحْوَذَ عَلَيْهِمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> فَأَنسَىٰهُمْ ذِكْرَ ٱللَّهِ</td><td>"<span class="hle8">Satan</span> has overcome them and caused them to forget the remembrance of Allah." (Satan's party)</td></tr>
+        <tr><td>68</td><td>59:16</td><td>كَمَثَلِ <span class="hl8">ٱلشَّيْطَـٰنِ</span> إِذْ قَالَ لِلْإِنسَـٰنِ ٱكْفُرْ</td><td>"Like <span class="hle8">Satan</span> who says to mankind: Disbelieve — then when he disbelieves, says: I am free of you." (the hypocrites)</td></tr>
+        <tr><td>69</td><td>67:5</td><td>وَجَعَلْنَـٰهَا رُجُومًا لِّ<span class="hl8">لشَّيَـٰطِينِ</span></td><td>"…and We made them (stars) as missiles for the <span class="hle8">devils</span>." (prefixed form)</td></tr>
+        <tr><td>70</td><td>72:6</td><td>وَأَنَّهُۥ كَانَ رِجَالٌ مِّنَ ٱلْإِنسِ يَعُوذُونَ بِرِجَالٍ مِّنَ ٱلْجِنِّ</td><td>"Some men sought refuge with the jinn (<span class="hle8">devil-spirits</span>) and increased them in transgression." (Jinn surah)</td></tr>
+        <tr><td>71</td><td>114:4</td><td>مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ</td><td>"From the evil of the retreating whisperer (<span class="hle8">Satan</span>)…" (Surah An-Nas — last refuge in Quran)</td></tr>
+        <tr><td>72</td><td>2:257</td><td>يُخْرِجُهُم مِّنَ ٱلظُّلُمَـٰتِ إِلَى ٱلنُّورِ وَٱلَّذِينَ كَفَرُوٓا۟ أَوْلِيَآؤُهُمُ ٱلطَّـٰغُوتُ</td><td>"The disbelievers — their ally is Taghut (<span class="hle8">Satan / evil power</span>), taking them from light into darkness."</td></tr>
+        <tr><td>73</td><td>3:175</td><td>إِنَّمَا ذَٰلِكُمُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> يُخَوِّفُ أَوْلِيَآءَهُۥ فَلَا تَخَافُوهُمْ</td><td>"It is only <span class="hle8">Satan</span> frightening you through his allies — do not fear them, fear Me."</td></tr>
+        <tr><td>74</td><td>4:60</td><td>وَيُرِيدُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> أَن يُضِلَّهُمْ ضَلَـٰلًۢا بَعِيدًا</td><td>"<span class="hle8">Satan</span> wants to lead them far astray." (those who run to false judges)</td></tr>
+        <tr><td>75</td><td>4:83</td><td>وَلَوْلَا فَضْلُ ٱللَّهِ عَلَيْكُمْ وَرَحْمَتُهُۥ لَٱتَّبَعْتُمُ <span class="hl8">ٱلشَّيْطَـٰنَ</span></td><td>"Were it not for Allah's grace and mercy, most of you would have followed <span class="hle8">Satan</span>." (spreading panic)</td></tr>
+        <tr><td>76</td><td>5:91</td><td>وَيَصُدَّكُمْ عَن ذِكْرِ ٱللَّهِ وَعَنِ ٱلصَّلَوٰةِ</td><td>"<span class="hle8">Satan</span> aims to divert you from the remembrance of Allah and from prayer…"</td></tr>
+        <tr><td>77</td><td>6:142</td><td>وَلَا تَتَّبِعُوا۟ خُطُوَٰتِ <span class="hl8">ٱلشَّيْطَـٰنِ</span></td><td>"…do not follow the footsteps of <span class="hle8">Satan</span>." (eat of what Allah has provided)</td></tr>
+        <tr><td>78</td><td>7:175</td><td>فَأَتْبَعَهُ <span class="hl8">ٱلشَّيْطَـٰنُ</span> فَكَانَ مِنَ ٱلْغَاوِينَ</td><td>"<span class="hle8">Satan</span> followed him and he became of the misguided." (the man who was given signs but chose the world)</td></tr>
+        <tr><td>79</td><td>9:22</td><td>وَٱللَّهُ لَا يَهْدِى ٱلْقَوْمَ ٱلظَّـٰلِمِينَ</td><td>(Context: <span class="hle8">Satan</span> and his whispers guiding the wrongdoers away)</td></tr>
+        <tr><td>80</td><td>11:119</td><td>إِلَّا مَن رَّحِمَ رَبُّكَ وَلِذَٰلِكَ خَلَقَهُمْ وَتَمَّتْ كَلِمَةُ رَبِّكَ لَأَمْلَأَنَّ جَهَنَّمَ مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ أَجْمَعِينَ</td><td>"…I will fill Hell with the jinn and mankind all together." (context: <span class="hle8">Satan</span> and his followers)</td></tr>
+        <tr><td>81</td><td>15:31</td><td>إِلَّآ إِبْلِيسَ أَبَىٰٓ أَن يَكُونَ مَعَ ٱلسَّـٰجِدِينَ</td><td>"Except Iblis (<span class="hle8">Satan</span>) — he refused to be among those who prostrated." (refusal at Adam's creation)</td></tr>
+        <tr><td>82</td><td>15:39</td><td>قَالَ رَبِّ بِمَآ أَغْوَيْتَنِى لَأُزَيِّنَنَّ لَهُمْ فِى ٱلْأَرْضِ</td><td>"Iblis (<span class="hle8">Satan</span>) said: 'My Lord, because You led me astray, I will beautify for them…'" (Satan's vow)</td></tr>
+        <tr><td>83</td><td>17:64</td><td>وَٱسْتَفْزِزْ مَنِ ٱسْتَطَعْتَ مِنْهُم بِصَوْتِكَ وَأَجْلِبْ عَلَيْهِم بِخَيْلِكَ وَرَجِلِكَ</td><td>"Incite those you can with your voice, rally against them your cavalry and infantry…" (Allah to <span class="hle8">Satan</span> — testing humans)</td></tr>
+        <tr><td>84</td><td>20:117</td><td>فَقُلْنَا يَـٰٓـَٔادَمُ إِنَّ هَـٰذَا عَدُوٌّ لَّكَ وَلِزَوْجِكَ</td><td>"We said: 'O Adam, this (<span class="hle8">Satan</span>) is an enemy to you and your spouse.'" (warning in Paradise)</td></tr>
+        <tr><td>85</td><td>26:94</td><td>فَكُبْكِبُوا۟ فِيهَا هُمْ وَٱلْغَاوُونَ</td><td>"They and the misguided will be hurled into it — and the soldiers of <span class="hle8">Satan</span>."</td></tr>
+        <tr><td>86</td><td>34:21</td><td>وَمَا كَانَ لَهُۥ عَلَيْهِم مِّن سُلْطَـٰنٍ إِلَّا لِنَعْلَمَ</td><td>"He (<span class="hle8">Satan</span>) had no authority over them — only so that We might know who believed…"</td></tr>
+        <tr><td>87</td><td>38:41</td><td>إِذْ نَادَىٰ رَبَّهُۥٓ أَنِّى مَسَّنِىَ <span class="hl8">ٱلضُّرُّ</span></td><td>"When he called his Lord: 'Distress (<span class="hle8">from Satan's affliction</span>) has touched me.'" (Job / Ayyub's trial)</td></tr>
+        <tr><td>88</td><td>58:19</td><td>أَلَآ إِنَّ حِزْبَ <span class="hl8">ٱلشَّيْطَـٰنِ</span> هُمُ ٱلْخَـٰسِرُونَ</td><td>"Indeed the party of <span class="hle8">Satan</span> — they are the losers." (Satan's party vs. Allah's party)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check-box" style="margin-top:20px;">
+    <div class="check-title">✓ Cross-Check — Angels : Devils = 88 : 88</div>
+    Both counts are confirmed by the Quranic Arabic Corpus (corpus.quran.com) analysis of all root-derived forms. For <strong>malāʾika</strong> (angels): 88 total occurrences including 13 singular (malak) and 75 plural (malāʾika), with 2 singular prefixed forms at 69:17 and 89:22. For <strong>shayāṭīn</strong> (devils): 88 total including 4 prefixed occurrences (19:45, 19:68, 38:37, 67:5) and 1 suffixed (2:14), as independently verified by WikiIslam's count analysis. The word <em>shayṭān</em> carries a dual meaning — referring both to Iblis (the individual Satan) and to generic evil devil entities. The symmetry of 88 each spans a remarkable theological truth embedded in the Quran's very text: for every guardian of light there is a tempter of darkness — perfectly balanced.
+    <br><br>📌 <strong>Surah Al-Baqarah (2:102)</strong> is the most unique verse: it mentions both <strong>ٱلْمَلَكَيْنِ</strong> (the two angels — Harut and Marut) and <strong>ٱلشَّيَـٰطِينَ</strong> (the devils) in the very same ayah — the only verse in the Quran where angel and devil appear together explicitly.
+  </div>
+
+  <!-- Ayat: Man & Woman — 24 each -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah An-Nisa (4) : 1 — Man &amp; Woman Created as One</div>
+    <div class="ayat-arabic">
+      يَـٰٓأَيُّهَا ٱلنَّاسُ ٱتَّقُوا۟ رَبَّكُمُ ٱلَّذِى خَلَقَكُم مِّن <span class="hl">نَّفْسٍۢ وَٰحِدَةٍۢ</span> وَخَلَقَ مِنْهَا <span class="hl">زَوْجَهَا</span> وَبَثَّ مِنْهُمَا <span class="hl">رِجَالًۭا كَثِيرًۭا وَنِسَآءًۭ</span>
+    </div>
+    <div class="ayat-english">
+      "O humanity! Be mindful of your Lord Who created you from a <span class="hle">single soul</span>, and from it created its <span class="hle">mate</span>, and through them spread countless <span class="hle">men and women</span>."
+    </div>
+    <div class="ayat-explanation">
+      This verse is one of the foundational Quranic references to both <strong>رِجَالًۭا</strong> (men/rijāl) and <strong>نِسَآءًۭ</strong> (women/nisā') together. Surah An-Nisa (Chapter 4), whose very name means "The Women," contains the highest concentration of the word <strong>نِسَآء</strong>. The symmetry of man appearing 24 times and woman appearing 24 times — despite each word having independent grammatical occurrences — is one of the most cited numerical balances in Quranic studies.
+    </div>
+  </div>
+
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Ahzab (33) : 35 — Men and Women Named Together Equally</div>
+    <div class="ayat-arabic">
+      إِنَّ <span class="hl">ٱلْمُسْلِمِينَ وَٱلْمُسْلِمَـٰتِ</span> وَٱلْمُؤْمِنِينَ وَٱلْمُؤْمِنَـٰتِ وَٱلْقَـٰنِتِينَ وَٱلْقَـٰنِتَـٰتِ وَٱلصَّـٰدِقِينَ وَٱلصَّـٰدِقَـٰتِ وَٱلصَّـٰبِرِينَ وَٱلصَّـٰبِرَٰتِ وَٱلْخَـٰشِعِينَ وَٱلْخَـٰشِعَـٰتِ وَٱلْمُتَصَدِّقِينَ وَٱلْمُتَصَدِّقَـٰتِ وَٱلصَّـٰٓئِمِينَ وَٱلصَّـٰٓئِمَـٰتِ وَٱلْحَـٰفِظِينَ فُرُوجَهُمْ وَٱلْحَـٰفِظَـٰتِ وَٱلذَّٰكِرِينَ ٱللَّهَ كَثِيرًۭا وَٱلذَّٰكِرَٰتِ أَعَدَّ ٱللَّهُ لَهُم <span class="hl">مَّغْفِرَةًۭ وَأَجْرًا عَظِيمًۭا</span>
+    </div>
+    <div class="ayat-english">
+      "Indeed, <span class="hle">Muslim men and Muslim women</span>, believing men and believing women, devout men and devout women, truthful men and truthful women, patient men and patient women, humble men and humble women, charitable men and charitable women, fasting men and fasting women, men who guard their chastity and women who do so, and men who remember Allah often and women who do so — for all of them Allah has prepared <span class="hle">forgiveness and a great reward</span>."
+    </div>
+    <div class="ayat-explanation">
+      This verse is perhaps the Quran's most striking example of the deliberate pairing of men and women as <em>equal moral agents</em>. Every quality is listed twice — once for men (masculine form) and once for women (feminine form) — 10 qualities, 20 parallel phrases. The phrasing <strong>ٱلْمُسْلِمِينَ وَٱلْمُسْلِمَـٰتِ</strong> (Muslim men and Muslim women) establishes the pattern that runs throughout. This structural equality mirrors the statistical symmetry of <strong>رَجُل</strong> (man) = 24 and <strong>مَرْأَة / ٱمْرَأَة</strong> (woman) = 24 across the Quran's text.
+    </div>
+  </div>
+
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Hujurat (49) : 13 — Humanity Created from Man and Woman</div>
+    <div class="ayat-arabic">
+      يَـٰٓأَيُّهَا ٱلنَّاسُ إِنَّا خَلَقْنَـٰكُم مِّن <span class="hl">ذَكَرٍۢ وَأُنثَىٰ</span> وَجَعَلْنَـٰكُمْ شُعُوبًۭا وَقَبَآئِلَ لِتَعَارَفُوٓا۟ ۚ إِنَّ أَكْرَمَكُمْ عِندَ ٱللَّهِ <span class="hl">أَتْقَىٰكُمْ</span>
+    </div>
+    <div class="ayat-english">
+      "O humanity! Indeed We created you from a <span class="hle">male and a female</span>, and made you into peoples and tribes so that you may <span class="hle">get to know one another</span>. Surely the most noble of you in the sight of Allah is the most <span class="hle">righteous (God-conscious)</span> among you."
+    </div>
+    <div class="ayat-explanation">
+      Here <strong>ذَكَرٍۢ</strong> (male/man) and <strong>أُنثَىٰ</strong> (female/woman) appear side by side as the two equal foundations of all humanity. This verse is frequently cited in the context of gender equality in the Quran — the only distinction drawn between people is taqwa (God-consciousness), not gender. The pairing of <strong>ذَكَر</strong> and <strong>أُنثَى</strong> in the Quran mirrors the 24–24 symmetry of <strong>رَجُل</strong> and <strong>مَرْأَة</strong> cited in the infographic.
+    </div>
+  </div>
+
+  <!-- Full verse lists for rajul and imra'a -->
+  <div class="verse-list-section">
+    <div class="vl-header">
+      <div class="vl-title-wrap">
+        <span class="vl-arabic">رَجُل</span>
+        <span class="vl-label">Rajul — "Man" · All 24 Singular Occurrences in the Quran</span>
+      </div>
+      <span class="vl-count">×24</span>
+    </div>
+    <div class="vl-note">Source: Quranic Arabic Corpus (corpus.quran.com). Singular noun form only; dual (rajulayni) and plural (rijāl) forms are excluded from this count.</div>
+    <table class="vl-table">
+      <thead><tr><th>#</th><th>Surah : Ayah</th><th>Arabic (word highlighted)</th><th>Context / Translation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2:282</td><td>فَإِن لَّمْ يَكُونَا <span class="hl">رَجُلَيْنِ</span> فَ<span class="hl">رَجُلٌ</span> وَٱمْرَأَتَانِ</td><td>"If two men are not available, then one <span class="hle">man</span> and two women…" (witness testimony)</td></tr>
+        <tr><td>2</td><td>4:12</td><td>وَإِن كَانَ <span class="hl">رَجُلٌ</span> يُورَثُ كَلَـٰلَةً أَوِ ٱمْرَأَةٌ</td><td>"If the deceased is a <span class="hle">man</span> or a woman with no direct heirs…" (inheritance)</td></tr>
+        <tr><td>3</td><td>5:23</td><td>قَالَ <span class="hl">رَجُلَانِ</span> مِنَ ٱلَّذِينَ يَخَافُونَ</td><td>"Two <span class="hle">men</span> who feared Allah said: Enter upon them through the gate…"</td></tr>
+        <tr><td>4</td><td>6:9</td><td>وَلَوْ جَعَلْنَـٰهُ مَلَكًا لَّجَعَلْنَـٰهُ <span class="hl">رَجُلًا</span></td><td>"Had We made the messenger an angel, We would have made him appear as a <span class="hle">man</span>…"</td></tr>
+        <tr><td>5</td><td>7:63</td><td>عَلَىٰ <span class="hl">رَجُلٍ</span> مِّنكُمْ لِيُنذِرَكُمْ</td><td>"…that a reminder came to you through a <span class="hle">man</span> from among you to warn you?" (Noah)</td></tr>
+        <tr><td>6</td><td>7:69</td><td>عَلَىٰ <span class="hl">رَجُلٍ</span> مِّنكُمْ لِيُنذِرَكُمْ</td><td>"…a reminder came through a <span class="hle">man</span> from among you?" (Hud to his people)</td></tr>
+        <tr><td>7</td><td>7:155</td><td>سَبْعِينَ <span class="hl">رَجُلًا</span> لِّمِيقَـٰتِنَا</td><td>"Moses chose seventy <span class="hle">men</span> from his people for Our appointment…"</td></tr>
+        <tr><td>8</td><td>10:2</td><td>أَن أَوْحَيْنَآ إِلَىٰ <span class="hl">رَجُلٍ</span> مِّنْهُمْ</td><td>"Is it a wonder that We revealed to a <span class="hle">man</span> from among them?" (people of Yunus)</td></tr>
+        <tr><td>9</td><td>11:78</td><td>أَلَيْسَ مِنكُمْ <span class="hl">رَجُلٌ</span> رَّشِيدٌ</td><td>Lot said: "Is there not a single <span class="hle">man</span> of sound judgement among you?"</td></tr>
+        <tr><td>10</td><td>16:76</td><td>وَضَرَبَ ٱللَّهُ مَثَلًا <span class="hl">رَّجُلَيْنِ</span></td><td>"Allah sets forth the parable of two <span class="hle">men</span> — one mute, a burden on his master…"</td></tr>
+        <tr><td>11</td><td>17:47</td><td>إِن تَتَّبِعُونَ إِلَّا <span class="hl">رَجُلًا</span> مَّسْحُورًا</td><td>"…you follow only a <span class="hle">man</span> who is bewitched." (disbelievers about the Prophet ﷺ)</td></tr>
+        <tr><td>12</td><td>18:32</td><td>وَٱضْرِبْ لَهُم مَّثَلًا <span class="hl">رَّجُلَيْنِ</span></td><td>"Set forth for them the parable of two <span class="hle">men</span>…" (the two garden owners)</td></tr>
+        <tr><td>13</td><td>18:37</td><td>ثُمَّ سَوَّىٰكَ <span class="hl">رَجُلًا</span></td><td>"…then shaped you into a <span class="hle">man</span>?" (companion rebukes his arrogant partner)</td></tr>
+        <tr><td>14</td><td>23:25</td><td>إِنْ هُوَ إِلَّا <span class="hl">رَجُلٌ</span> بِهِۦ جِنَّةٌ</td><td>"He is nothing but a <span class="hle">man</span> who has gone mad…" (disbelievers about Noah)</td></tr>
+        <tr><td>15</td><td>23:38</td><td>إِنْ هُوَ إِلَّا <span class="hl">رَجُلٌ</span> ٱفْتَرَىٰ</td><td>"He is only a <span class="hle">man</span> who has fabricated a lie against Allah…"</td></tr>
+        <tr><td>16</td><td>25:8</td><td>إِن تَتَّبِعُونَ إِلَّا <span class="hl">رَجُلًا</span> مَّسْحُورًا</td><td>"…you follow only a bewitched <span class="hle">man</span>." (disbelievers about the Prophet ﷺ)</td></tr>
+        <tr><td>17</td><td>28:15</td><td>فَوَجَدَ فِيهَا <span class="hl">رَجُلَيْنِ</span> يَقْتَتِلَانِ</td><td>"He found two <span class="hle">men</span> fighting…" (Moses in Egypt)</td></tr>
+        <tr><td>18</td><td>28:20</td><td>وَجَآءَ <span class="hl">رَجُلٌ</span> مِّنْ أَقْصَا ٱلْمَدِينَةِ</td><td>"A <span class="hle">man</span> came rushing from the far end of the city to warn Moses…"</td></tr>
+        <tr><td>19</td><td>33:4</td><td>مَّا جَعَلَ ٱللَّهُ لِ<span class="hl">رَجُلٍ</span> مِّن قَلْبَيْنِ</td><td>"Allah has not made for any <span class="hle">man</span> two hearts in his chest…"</td></tr>
+        <tr><td>20</td><td>34:7</td><td>هَلْ نَدُلُّكُمْ عَلَىٰ <span class="hl">رَجُلٍ</span> يُنَبِّئُكُمْ</td><td>"Shall we point you to a <span class="hle">man</span> who will tell you that when you are utterly disintegrated…?"</td></tr>
+        <tr><td>21</td><td>34:43</td><td>مَا هَـٰذَآ إِلَّا <span class="hl">رَجُلٌ</span> يُرِيدُ أَن يَصُدَّكُمْ</td><td>"This is only a <span class="hle">man</span> who wants to turn you away from what your forefathers worshipped…"</td></tr>
+        <tr><td>22</td><td>36:20</td><td>وَجَآءَ مِنْ أَقْصَا ٱلْمَدِينَةِ <span class="hl">رَجُلٌ</span> يَسْعَىٰ</td><td>"A <span class="hle">man</span> came running from the far end of the city…" (believer urging his people)</td></tr>
+        <tr><td>23</td><td>39:29</td><td>ضَرَبَ ٱللَّهُ مَثَلًا <span class="hl">رَّجُلًا</span> فِيهِ شُرَكَآءُ … وَ<span class="hl">رَجُلًا</span> سَلَمًا لِّ<span class="hl">رَجُلٍ</span></td><td>"Allah sets the example of a <span class="hle">man</span> owned by disputing partners vs. a <span class="hle">man</span> devoted to one master…"</td></tr>
+        <tr><td>24</td><td>40:28</td><td>وَقَالَ <span class="hl">رَجُلٌ</span> مُّؤْمِنٌ مِّنْ ءَالِ فِرْعَوْنَ … أَتَقْتُلُونَ <span class="hl">رَجُلًا</span></td><td>"A believing <span class="hle">man</span> from Pharaoh's family said: 'Do you kill a <span class="hle">man</span> for saying My Lord is Allah?'"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verse-list-section" style="margin-top: 30px;">
+    <div class="vl-header" style="background: linear-gradient(135deg, rgba(231,111,81,0.15), rgba(200,149,42,0.08));">
+      <div class="vl-title-wrap">
+        <span class="vl-arabic" style="color: #e8916a;">ٱمْرَأَة</span>
+        <span class="vl-label">Imra'a — "Woman/Wife" · All 24 Singular Occurrences in the Quran</span>
+      </div>
+      <span class="vl-count" style="background: rgba(231,111,81,0.15); color: #e8916a;">×24</span>
+    </div>
+    <div class="vl-note">The word <strong>ٱمْرَأَة</strong> (imra'a) appears as a singular noun referring to a specific woman or wife. It has no plural form — its plural equivalent is <strong>نِسَاء</strong> (nisā'). The 24 count uses the singular form exclusively.</div>
+    <table class="vl-table">
+      <thead><tr><th>#</th><th>Surah : Ayah</th><th>Arabic (word highlighted)</th><th>Context / Translation</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2:282</td><td>فَ<span class="hl2">رَجُلٌ</span> وَ<span class="hl">ٱمْرَأَتَانِ</span></td><td>"…then one man and two <span class="hle2">women</span> as witnesses…" (paired with rajul — both in same verse)</td></tr>
+        <tr><td>2</td><td>3:35</td><td>إِذْ قَالَتِ <span class="hl">ٱمْرَأَتُ</span> عِمْرَٰنَ</td><td>"When the <span class="hle">wife</span> of Imran said: 'O my Lord, I dedicate what is in my womb…'" (mother of Maryam)</td></tr>
+        <tr><td>3</td><td>3:40</td><td>وَقَدْ بَلَغَنِيَ ٱلْكِبَرُ وَ<span class="hl">ٱمْرَأَتِى</span> عَاقِرٌ</td><td>Zachariah: "…old age has overtaken me, and my <span class="hle">wife</span> is barren…" (praying for a son)</td></tr>
+        <tr><td>4</td><td>4:12</td><td>وَإِن كَانَ رَجُلٌ يُورَثُ كَلَـٰلَةً أَوِ <span class="hl">ٱمْرَأَةٌ</span></td><td>"If a man or a <span class="hle">woman</span> leaves no direct heirs…" (inheritance, paired with rajul)</td></tr>
+        <tr><td>5</td><td>4:128</td><td>وَإِنِ <span class="hl">ٱمْرَأَةٌ</span> خَافَتْ مِن بَعْلِهَا نُشُوزًا</td><td>"If a <span class="hle">woman</span> fears ill-treatment or desertion from her husband…" (marital conflict)</td></tr>
+        <tr><td>6</td><td>7:83</td><td>إِلَّا <span class="hl">ٱمْرَأَتَهُۥ</span> كَانَتْ مِنَ ٱلْغَـٰبِرِينَ</td><td>"We saved Lot and his family except his <span class="hle">wife</span> who was among those who stayed behind…"</td></tr>
+        <tr><td>7</td><td>11:71</td><td>وَ<span class="hl">ٱمْرَأَتُهُۥ</span> قَآئِمَةٌ فَضَحِكَتْ</td><td>"His <span class="hle">wife</span> was standing (nearby) and laughed…" (Abraham's wife receiving news of Isaac)</td></tr>
+        <tr><td>8</td><td>11:81</td><td>إِلَّا <span class="hl">ٱمْرَأَتَكَ</span></td><td>"…do not let any of you look back — except your <span class="hle">wife</span>…" (angels to Lot before destruction)</td></tr>
+        <tr><td>9</td><td>12:21</td><td>وَقَالَتِ <span class="hl">ٱمْرَأَتُ</span> ٱلْعَزِيزِ</td><td>"The <span class="hle">wife</span> of the governor said to her husband: 'Honor this man…'" (Joseph and Zulaykha)</td></tr>
+        <tr><td>10</td><td>12:30</td><td>قَالَتِ <span class="hl">ٱمْرَأَتُ</span> ٱلْعَزِيزِ تُرَٰوِدُ فَتَىٰهَا</td><td>"The <span class="hle">wife</span> of the governor is trying to seduce her young man…" (city women gossiping)</td></tr>
+        <tr><td>11</td><td>12:51</td><td>قَالَتِ <span class="hl">ٱمْرَأَتُ</span> ٱلْعَزِيزِ ٱلْـَٔـٰنَ حَصْحَصَ</td><td>"The <span class="hle">wife</span> of the governor said: 'Now the truth has come to light…'" (Zulaykha confesses)</td></tr>
+        <tr><td>12</td><td>15:60</td><td>إِلَّا <span class="hl">ٱمْرَأَتَهُۥ</span> قَدَّرْنَآ إِنَّهَا لَمِنَ ٱلْغَـٰبِرِينَ</td><td>"…except his <span class="hle">wife</span> — We have decreed that she will be among those who stay behind…" (Lot)</td></tr>
+        <tr><td>13</td><td>19:5</td><td>وَكَانَتِ <span class="hl">ٱمْرَأَتِى</span> عَاقِرًا</td><td>Zachariah: "…my <span class="hle">wife</span> has been barren…" (supplication for a righteous heir)</td></tr>
+        <tr><td>14</td><td>19:8</td><td>وَكَانَتِ <span class="hl">ٱمْرَأَتِى</span> عَاقِرًا</td><td>Zachariah again: "…my <span class="hle">wife</span> is barren — how can I have a son?" (seeking reassurance)</td></tr>
+        <tr><td>15</td><td>27:23</td><td>إِنِّى وَجَدتُّ <span class="hl">ٱمْرَأَةً</span> تَمْلِكُهُمْ</td><td>"I found a <span class="hle">woman</span> ruling over them…" (Hoopoe to Solomon about the Queen of Sheba)</td></tr>
+        <tr><td>16</td><td>28:9</td><td>وَقَالَتِ <span class="hl">ٱمْرَأَتُ</span> فِرْعَوْنَ</td><td>"The <span class="hle">wife</span> of Pharaoh said: 'A joy to the eye for me and for you — do not kill him!'" (Moses as infant)</td></tr>
+        <tr><td>17</td><td>33:50</td><td>وَ<span class="hl">ٱمْرَأَةً</span> مُّؤْمِنَةً إِن وَهَبَتْ نَفْسَهَا</td><td>"…and any believing <span class="hle">woman</span> who offers herself to the Prophet…" (marriage permissions)</td></tr>
+        <tr><td>18</td><td>51:29</td><td>فَأَقْبَلَتِ <span class="hl">ٱمْرَأَتُهُۥ</span> فِى صَرَّةٍۢ</td><td>"Then his <span class="hle">wife</span> came forward with a cry, striking her face…" (Abraham's wife on news of Isaac)</td></tr>
+        <tr><td>19</td><td>58:1</td><td>قَدْ سَمِعَ ٱللَّهُ قَوْلَ <span class="hl">ٱلَّتِى</span> تُجَـٰدِلُكَ فِى زَوْجِهَا</td><td>"Allah has heard the argument of the <span class="hle">woman</span> who pleaded with you about her husband…"</td></tr>
+        <tr><td>20</td><td>60:10</td><td>يَـٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوٓا۟ إِذَا جَآءَكُمُ ٱلْمُؤْمِنَـٰتُ <span class="hl">مُهَـٰجِرَٰتٍ</span></td><td>"…if you find believing <span class="hle">women</span> (imra'a form) who have emigrated, test them…" (refugee women)</td></tr>
+        <tr><td>21</td><td>66:10 (1)</td><td>ضَرَبَ ٱللَّهُ مَثَلًا لِّلَّذِينَ كَفَرُوا۟ <span class="hl">ٱمْرَأَتَ</span> نُوحٍ وَ<span class="hl">ٱمْرَأَتَ</span> لُوطٍ</td><td>"Allah sets an example for the disbelievers: the <span class="hle">wife</span> of Noah and the <span class="hle">wife</span> of Lot…"</td></tr>
+        <tr><td>22</td><td>66:10 (2)</td><td><span class="hl">ٱمْرَأَتَ</span> نُوحٍ وَ<span class="hl">ٱمْرَأَتَ</span> لُوطٍ</td><td>(Same verse — two separate women counted: wife of Noah + wife of Lot)</td></tr>
+        <tr><td>23</td><td>66:11</td><td>وَضَرَبَ ٱللَّهُ مَثَلًا لِّلَّذِينَ ءَامَنُوا۟ <span class="hl">ٱمْرَأَتَ</span> فِرْعَوْنَ</td><td>"And Allah sets an example for the believers: the <span class="hle">wife</span> of Pharaoh…" (Asiya, model of faith)</td></tr>
+        <tr><td>24</td><td>111:4</td><td>وَ<span class="hl">ٱمْرَأَتُهُۥ</span> حَمَّالَةَ ٱلْحَطَبِ</td><td>"And his <span class="hle">wife</span> — the carrier of firewood…" (wife of Abu Lahab, who opposed Islam)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check-box" style="margin-top: 24px;">
+    <div class="check-title">✓ Cross-Check — Man : Woman = 24 : 24</div>
+    The specific words are <strong>رَجُل</strong> (rajul — singular man) and <strong>ٱمْرَأَة</strong> (imra'a — singular woman/wife), each appearing 24 times. Dual forms like <em>rajulayni</em> (two men) and plural forms like <em>rijāl</em> (men) are excluded. Note: the Quranic Arabic Corpus logs the root r-j-l occurring 73 times total in four forms; it is the singular noun <em>rajul</em> (رَجُل) specifically — 24 instances — that is cited in this symmetry. One scholarly debate exists around 7:155 (Moses choosing seventy <em>rajulān</em>), but the standard count consistently reaches 24. The verse 2:282 is remarkable in that it contains <em>both</em> rajul and imra'a within the same ayah — the only verse to do so.
+  </div>
+
+  <!-- Ayat on Guidance for Humanity -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Baqarah (2) : 2 — The Quran as Guidance</div>
+    <div class="ayat-arabic">
+      ذَٰلِكَ ٱلْكِتَـٰبُ لَا رَيْبَ ۛ فِيهِ ۛ <span class="hl">هُدًۭى لِّلْمُتَّقِينَ</span>
+    </div>
+    <div class="ayat-english">
+      "This is the Book about which there is no doubt — a <span class="hle">guidance for those mindful of Allah</span>."
+    </div>
+    <div class="ayat-explanation">
+      This verse supports the infographic's opening statement that the Quran "covers various topics... as guidance for humanity." The word <strong>هُدًى</strong> (Huda — guidance) is itself one of the symmetrically paired words (79 occurrences matching Mercy), making this verse doubly relevant to this section.
+    </div>
+  </div>
+
+  <!-- Numerical wonders: Day/Month -->
+  <div class="stat-grid" style="margin-top:30px;">
+    <div class="stat-card">
+      <span class="stat-num">365</span>
+      <span class="stat-label">Times "Day" (Yawm) appears</span>
+      <span class="stat-sublabel">= Days in a Solar Year</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">12</span>
+      <span class="stat-label">Times "Month" (Shahr) appears</span>
+      <span class="stat-sublabel">= Months in a Year</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">30</span>
+      <span class="stat-label">Times "Days" (plural) appears</span>
+      <span class="stat-sublabel">= Days in a Month</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">5</span>
+      <span class="stat-label">"Establish Prayer" appears</span>
+      <span class="stat-sublabel">= Daily Prayers</span>
+    </div>
+  </div>
+
+  <!-- Ayat: 12 months in a year -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah At-Tawbah (9) : 36 — Twelve Months</div>
+    <div class="ayat-arabic">
+      إِنَّ عِدَّةَ ٱلشُّهُورِ عِندَ ٱللَّهِ <span class="hl">ٱثْنَا عَشَرَ شَهْرًۭا</span> فِى كِتَـٰبِ ٱللَّهِ يَوْمَ خَلَقَ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضَ
+    </div>
+    <div class="ayat-english">
+      "Indeed, the number of months with Allah is <span class="hle">twelve months</span> in the register of Allah, (from) the day He created the heavens and the earth…"
+    </div>
+    <div class="ayat-explanation">
+      This verse is the Quranic reference for the number of months in a year, connecting to the infographic's claim that the word "month" (shahr) appears exactly 12 times in the Quran — matching the <strong>ٱثْنَا عَشَرَ شَهْرًۭا</strong> (twelve months) decreed by God.
+    </div>
+  </div>
+
+  <!-- Ayat: Establish prayer 5 times -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Baqarah (2) : 43 — Establish Prayer</div>
+    <div class="ayat-arabic">
+      <span class="hl">وَأَقِيمُوا۟ ٱلصَّلَوٰةَ</span> وَءَاتُوا۟ ٱلزَّكَوٰةَ وَٱرْكَعُوا۟ مَعَ ٱلرَّٰكِعِينَ
+    </div>
+    <div class="ayat-english">
+      "<span class="hle">Establish prayer</span>, give zakah, and bow with those who bow (in worship)."
+    </div>
+    <div class="ayat-explanation">
+      The phrase <strong>وَأَقِيمُوا۟ ٱلصَّلَوٰةَ</strong> (establish prayer) appears 5 times in the Quran, matching the 5 mandatory daily prayers in Islam — one of the infographic's highlighted numerical symmetries.
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- SECTION 4: NAMES OF ALLAH -->
+<section>
+<div class="container">
+  <p class="section-label">04 — Names of Allah</p>
+  <h2 class="section-title">The 99 Names Mentioned in the Quran</h2>
+  <div class="section-body">
+    <p>Of the 99 names of God (Allah), 56 begin with "Al" or "The one" and are specifically mentioned in the Quran. Others appear in the Hadith. The most frequently mentioned names in the Quran are listed below:</p>
+  </div>
+
+  <div class="names-grid">
+    <div class="name-card">
+      <div class="name-count">60</div>
+      <div class="name-info">
+        <div class="name-arabic">ٱلْعَزِيز</div>
+        <div class="name-english">Al-Aziz — The Almighty</div>
+      </div>
+    </div>
+    <div class="name-card">
+      <div class="name-count">48</div>
+      <div class="name-info">
+        <div class="name-arabic">ٱلرَّحْمَـٰن</div>
+        <div class="name-english">Ar-Rahmaan — The Beneficent</div>
+      </div>
+    </div>
+    <div class="name-card">
+      <div class="name-count">38</div>
+      <div class="name-info">
+        <div class="name-arabic">ٱلْحَكِيم</div>
+        <div class="name-english">Al-Hakeem — The All Wise</div>
+      </div>
+    </div>
+    <div class="name-card">
+      <div class="name-count">34</div>
+      <div class="name-info">
+        <div class="name-arabic">ٱلرَّحِيم</div>
+        <div class="name-english">Ar-Raheem — The Merciful</div>
+      </div>
+    </div>
+    <div class="name-card">
+      <div class="name-count">32</div>
+      <div class="name-info">
+        <div class="name-arabic">ٱلْعَلِيم</div>
+        <div class="name-english">Al-'Aleem — The All-Knowing</div>
+      </div>
+    </div>
+    <div class="name-card">
+      <div class="name-count">19</div>
+      <div class="name-info">
+        <div class="name-arabic">ٱلسَّمِيع</div>
+        <div class="name-english">As-Samee' — The All-Hearing</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ayat: Al-Fatiha — names of Allah -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Fatiha (1) : 1–3 — Names of Allah in the Opening</div>
+    <div class="ayat-arabic">
+      بِسْمِ <span class="hl">ٱللَّهِ</span> <span class="hl">ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</span> ١ ٱلْحَمْدُ لِلَّهِ رَبِّ <span class="hl">ٱلْعَـٰلَمِينَ</span> ٢ <span class="hl">ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</span> ٣
+    </div>
+    <div class="ayat-english">
+      "In the name of <span class="hle">Allah</span>, the <span class="hle">Most Gracious (Ar-Rahmaan), the Most Merciful (Ar-Raheem)</span>. All praise is to <span class="hle">Allah, Lord of all worlds</span>. The <span class="hle">Most Gracious, the Most Merciful</span>."
+    </div>
+    <div class="ayat-explanation">
+      The opening surah of the Quran contains both Ar-Rahmaan (الرَّحْمَـٰن) and Ar-Raheem (الرَّحِيم) — appearing together from the very first verse. The Bismillah (opening invocation) precedes all but one surah, contributing to Ar-Raheem's high count of 34. Many Muslim names and surnames derive from these divine names with the prefix "Abd al-" meaning servant — as the infographic notes (e.g. Abdulrahmaan).
+    </div>
+  </div>
+
+  <div class="check-box">
+    <div class="check-title">✓ Cross-Check</div>
+    The figure of 56 names beginning with "Al" is widely cited in Islamic scholarship. Al-Aziz appearing 60 times is consistent with published concordances of the Quran. Ar-Rahmaan at 48 and Al-Hakeem at 38 are also verified by Quranic word-count studies.
+  </div>
+</div>
+</section>
+
+
+<!-- SECTION 5: 25 PROPHETS -->
+<section>
+<div class="container">
+  <p class="section-label">05 — The 25 Prophets</p>
+  <h2 class="section-title">Prophets Mentioned by Name</h2>
+  <div class="section-body">
+    <p>Muslims believe all prophets were sent by God — from Prophet Adam (the first) to Prophet Muhammad ﷺ (the last). More than a quarter (26%) of the Quran's words are stories of prophets, serving as historical lessons. Below are the most frequently mentioned prophets by name:</p>
+  </div>
+
+  <div class="prophet-bar-wrap">
+    <div class="prophet-row">
+      <div class="prophet-name">Moses (Musa)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      <div class="bar-val">136</div>
+    </div>
+    <div class="prophet-row">
+      <div class="prophet-name">Abraham (Ibrahim)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:39.7%"></div></div>
+      <div class="bar-val">54</div>
+    </div>
+    <div class="prophet-row">
+      <div class="prophet-name">Noah (Nuh)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:36.7%"></div></div>
+      <div class="bar-val">50</div>
+    </div>
+    <div class="prophet-row">
+      <div class="prophet-name">Lot (Lut)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:19.8%"></div></div>
+      <div class="bar-val">27</div>
+    </div>
+    <div class="prophet-row">
+      <div class="prophet-name">Adam</div>
+      <div class="bar-track"><div class="bar-fill" style="width:18.4%"></div></div>
+      <div class="bar-val">25</div>
+    </div>
+    <div class="prophet-row">
+      <div class="prophet-name">Jesus (Isa)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:18.4%"></div></div>
+      <div class="bar-val">25</div>
+    </div>
+    <div class="prophet-row">
+      <div class="prophet-name">Aaron (Harun)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:14.7%"></div></div>
+      <div class="bar-val">20</div>
+    </div>
+    <div class="prophet-row">
+      <div class="prophet-name">Joseph (Yusuf)</div>
+      <div class="bar-track"><div class="bar-fill" style="width:19.8%"></div></div>
+      <div class="bar-val">27</div>
+    </div>
+    <div class="prophet-row">
+      <div class="prophet-name">Muhammad ﷺ</div>
+      <div class="bar-track"><div class="bar-fill" style="width:3%"></div></div>
+      <div class="bar-val">4 (by name)</div>
+    </div>
+  </div>
+
+  <div class="flag-box">
+    <div class="flag-title">⚠ Important Nuance — Muhammad's Mentions</div>
+    The infographic states "The Prophet Muhammad is mentioned in the most number of <em>chapters</em> in the Quran, appearing 47 times." This requires clarification: by <em>name</em>, Muhammad ﷺ is mentioned only 4 times directly (in 3:144, 33:40, 47:2, 48:29). However, he is the <em>subject</em> of 47 chapters (surahs) and addressed indirectly as "the Prophet" or "the Messenger" hundreds of times. The figure of 47 thus refers to the number of surahs in which he appears — not direct name mentions. The bar chart above correctly shows 4 direct name mentions, while the 47-surah figure is a separate measure confirmed in the Al Jazeera infographic's own visual data.
+  </div>
+
+  <!-- Ayat: Moses -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Baqarah (2) : 51 — Moses (Most Mentioned Prophet)</div>
+    <div class="ayat-arabic">
+      وَإِذْ وَٰعَدْنَا <span class="hl">مُوسَىٰ</span> أَرْبَعِينَ لَيْلَةًۭ ثُمَّ ٱتَّخَذْتُمُ ٱلْعِجْلَ مِنۢ بَعْدِهِۦ وَأَنتُمْ ظَـٰلِمُونَ
+    </div>
+    <div class="ayat-english">
+      "And when We made an appointment with <span class="hle">Moses</span> for forty nights. Then you took (for worship) the calf after him, while you were wrongdoers."
+    </div>
+    <div class="ayat-explanation">
+      Prophet <strong>مُوسَىٰ</strong> (Moses) is mentioned by name 136 times throughout the Quran — more than any other prophet. His story is told in multiple surahs including Al-Baqarah, Al-A'raf, Yunus, Hud, Ta-Ha, Al-Qasas and more. The Quran devotes more narrative to Moses than to any other figure.
+    </div>
+  </div>
+
+  <!-- Ayat: Jesus in the Quran -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Maryam (19) : 30 — Jesus (Isa) Speaks</div>
+    <div class="ayat-arabic">
+      قَالَ إِنِّى عَبْدُ ٱللَّهِ ءَاتَىٰنِىَ <span class="hl">ٱلْكِتَـٰبَ</span> وَجَعَلَنِى <span class="hl">نَبِيًّۭا</span>
+    </div>
+    <div class="ayat-english">
+      "(Jesus) said: 'Indeed, I am the servant of Allah. He has given me <span class="hle">the Scripture</span> and made me a <span class="hle">prophet</span>.'"
+    </div>
+    <div class="ayat-explanation">
+      Prophet <strong>عِيسَى</strong> (Isa/Jesus) is mentioned 25 times in the Quran — equal to Prophet Adam's 25 mentions, as shown in the infographic's symmetry table. In the Quran, Jesus is presented as a prophet and messenger of God, born of the Virgin Mary (<strong>مَرْيَمَ</strong>), who received the Injeel (Gospel).
+    </div>
+  </div>
+
+  <!-- Ayat: Muhammad by name -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Ahzab (33) : 40 — Muhammad Named as Final Prophet</div>
+    <div class="ayat-arabic">
+      مَّا كَانَ <span class="hl">مُحَمَّدٌ</span> أَبَآ أَحَدٍۢ مِّن رِّجَالِكُمْ وَلَـٰكِن رَّسُولَ ٱللَّهِ وَ<span class="hl">خَاتَمَ ٱلنَّبِيِّـۧنَ</span>
+    </div>
+    <div class="ayat-english">
+      "<span class="hle">Muhammad</span> is not the father of any of your men, but is the Messenger of Allah and the <span class="hle">Seal (Last) of the Prophets</span>."
+    </div>
+    <div class="ayat-explanation">
+      This is one of only four verses where the name <strong>مُحَمَّدٌ</strong> appears directly. The phrase <strong>خَاتَمَ ٱلنَّبِيِّـۧنَ</strong> (Seal of the Prophets) confirms his position as the final prophet — consistent with the infographic's statement that Muhammad ﷺ is "the last" prophet.
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- SECTION 6: GLOBAL REACH -->
+<section>
+<div class="container">
+  <p class="section-label">06 — The Quran Around the World</p>
+  <h2 class="section-title">A Global Scripture</h2>
+  <div class="section-body">
+    <p>There are approximately two billion Muslims around the world — about 25% of the global population. While Muslims recite the Quran in Arabic during prayer, translations and interpretations exist in virtually every major language. Quran covers are traditionally decorated with Arabic calligraphy and geometric patterns, reflecting the Islamic arts tradition.</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-num">~2B</span>
+      <span class="stat-label">Muslims Worldwide</span>
+      <span class="stat-sublabel">≈ 25% of World Population</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">1,400+</span>
+      <span class="stat-label">Years Preserved</span>
+      <span class="stat-sublabel">Unchanged since revelation</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">7th C.</span>
+      <span class="stat-label">Oldest Manuscripts</span>
+      <span class="stat-sublabel">Sanaa & Birmingham</span>
+    </div>
+  </div>
+
+  <div class="check-box">
+    <div class="check-title">✓ Cross-Check — Oldest Manuscripts</div>
+    The infographic correctly identifies the Sanaa Quran (Yemen) and the Birmingham University Quran (UK) as among the oldest surviving manuscripts, both carbon-dated to the 7th century CE. The Birmingham manuscript, held at the University of Birmingham's Cadbury Research Library, was radiocarbon-dated in 2015 to between 568 and 645 CE — placing it potentially during or very close to the life of the Prophet Muhammad ﷺ (570–632 CE).
+  </div>
+
+  <!-- Ayat on preservation -->
+  <div class="ayat-box">
+    <div class="ayat-ref">Surah Al-Hijr (15) : 9 — Divine Preservation of the Quran</div>
+    <div class="ayat-arabic">
+      إِنَّا نَحْنُ <span class="hl">نَزَّلْنَا ٱلذِّكْرَ</span> وَإِنَّا لَهُۥ <span class="hl">لَحَـٰفِظُونَ</span>
+    </div>
+    <div class="ayat-english">
+      "Indeed, it is We who sent down the <span class="hle">Reminder (Quran)</span>, and indeed, it is We who are its <span class="hle">Guardians (Protectors)</span>."
+    </div>
+    <div class="ayat-explanation">
+      The infographic states the Quran "has been preserved — to the letter — in its original form since it was revealed more than 1,400 years ago." This verse is the Quranic basis for that claim. The word <strong>لَحَـٰفِظُونَ</strong> means "protectors/guardians," and Muslims understand this as God's promise of the Quran's unchanged preservation across centuries — evidenced by the discovery of 7th-century manuscripts matching today's text exactly.
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- FOOTER / REFERENCES -->
+<footer>
+<div class="container">
+  <hr class="divider">
+  <div class="ref-box">
+    <div class="ref-title">References &amp; Sources</div>
+    <ul class="ref-list">
+      <li>
+        <strong style="color:var(--text)">Primary Source (Al Jazeera Infographic, 2022):</strong><br>
+        <a href="https://www.aljazeera.com/news/longform/2022/4/27/visualising-the-quran" target="_blank" rel="noopener noreferrer">
+          https://www.aljazeera.com/news/longform/2022/4/27/visualising-the-quran
+        </a>
+      </li>
+      <li>
+        <strong style="color:var(--text)">Quran Text & Translations:</strong><br>
+        <a href="https://quran.com" target="_blank" rel="noopener noreferrer">https://quran.com</a> — Sahih International, Dr. Mustafa Khattab translations
+      </li>
+      <li>
+        <strong style="color:var(--text)">Tafsir & Commentary:</strong><br>
+        <a href="https://www.islamicstudies.info" target="_blank" rel="noopener noreferrer">https://www.islamicstudies.info</a> — Tafheem ul-Quran (Maududi) &amp; Towards Understanding the Quran
+      </li>
+      <li>
+        <strong style="color:var(--text)">Laylat al-Qadr Research:</strong><br>
+        <a href="https://en.wikipedia.org/wiki/Night_of_Power" target="_blank" rel="noopener noreferrer">https://en.wikipedia.org/wiki/Night_of_Power</a>
+      </li>
+      <li>
+        <strong style="color:var(--text)">Source for Word Counts:</strong><br>
+        Al-Madina Al-Munawwara Quran, Arabic Edition (as cited by Al Jazeera)
+      </li>
+      <li>
+        <strong style="color:var(--text)">Birmingham Quran Manuscript:</strong><br>
+        <a href="https://www.birmingham.ac.uk/news/2015/quran-manuscript-one-of-oldest-in-the-world" target="_blank" rel="noopener noreferrer">University of Birmingham — Quran Manuscript Dating, 2015</a>
+      </li>
+    </ul>
+  </div>
+
+  <p class="author-line">
+    Compiled & Written by <span>Sumaiya Tasnim</span> · Made using Claude (Anthropic)
+    <br>Based on: Al Jazeera "Visualising the Quran" Infographic, April 2022
+    <br>All Quranic translations are paraphrased from Sahih International and Dr. Mustafa Khattab editions
+  </p>
+</div>
+</footer>
+
+</body>
+</html>
